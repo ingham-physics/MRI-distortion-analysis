@@ -24,11 +24,9 @@ class ReorientationWindow:
         self.parent = parent
         self.reoriented_files = []
 
-    def __init__(self, parent):
+    def show(self):
 
-        self.parent = parent
-
-        self.top = tk.Toplevel(parent)
+        self.top = tk.Toplevel(self.parent)
         self.top.title('Convert Dicom Files')
         self.top.geometry('600x340')
         self.top.update()
