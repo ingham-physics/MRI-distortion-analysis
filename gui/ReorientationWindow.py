@@ -17,6 +17,8 @@ import os
 import logging
 logger = logging.getLogger(__name__)
 
+from ReOrientation.orientation import reorient
+
 class ReorientationWindow:
 
     def __init__(self, parent):
@@ -27,11 +29,11 @@ class ReorientationWindow:
     def show(self):
 
         self.top = tk.Toplevel(self.parent)
-        self.top.title('Convert Dicom Files')
+        self.top.title('Reorientation')
         self.top.geometry('600x340')
         self.top.update()
         self.top.minsize(self.top.winfo_width(), self.top.winfo_height())
-        self.top.resizable(False, False)
+        self.top.resizable(True, True)
         self.top.focus_set()
         self.top.grab_set()
 
@@ -39,6 +41,7 @@ class ReorientationWindow:
 
         filesFrame = ttk.Labelframe(self.top, text='File Paths')
         filesFrame.grid(row=0, padx=5, pady=5, sticky="news")
+        filesFrame.rowconfigure(1, weight=1)
 
         self.listbox_paths = tk.Listbox(filesFrame)
         self.listbox_paths.grid(row=1, columnspan=1, padx=(5,0), pady=5, sticky='news')
@@ -59,10 +62,10 @@ class ReorientationWindow:
 
         tk.Button(filesFrame,text='Add File', command=self.add_file, width=20).grid(row=0, padx=5, pady=5)
         tk.Button(filesFrame,text='Remove Selected', command=self.remove_file, width=20).grid(row=2, padx=5, pady=5)
-        tk.Button(self.top,text='Run Reorientation', command=self.run, width=30, height=2).grid(row=2, padx=5, pady=5)
+        tk.Button(self.top,text='Reorient', command=self.reorient, width=30, height=2).grid(row=2, padx=5, pady=5)
 
         self.top.columnconfigure(0, weight=1)
-        self.top.rowconfigure(6, weight=1)
+        self.top.rowconfigure(0, weight=1)
 
     def add_file(self):
 
@@ -76,6 +79,29 @@ class ReorientationWindow:
         for ind in selected_indexes:
             self.listbox_paths.delete(int(ind))
 
-    def run(self):
+    def reorient(self):
 
-        print(self.listbox_paths.get(0,tk.END))
+        input_files = self.listbox_paths.get(0,tk.END)
+
+        if len(input_files) > 0:
+
+            # Create the output directory if it doesn't already exist
+            output_dir = 'working/step2'
+            try:
+                # Python 3
+                os.makedirs(output_dir, exist_ok=True) # > Python 3.2
+            except TypeError:
+                # Python 2
+                try:
+                    os.makedirs(output_dir)
+                except OSError:
+                    if not os.path.isdir(output_dir):
+                        raise
+
+        for input_file in input_files:
+            output_file = reorient(input_file,'working/step2')
+            self.reoriented_files.append(output_file)
+
+        messagebox.showinfo("Done", "Reorientation Completed")
+
+        self.top.destroy()

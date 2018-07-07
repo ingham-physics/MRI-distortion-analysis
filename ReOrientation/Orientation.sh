@@ -4,8 +4,8 @@ DStart=`date`
 echo $DStart
 
 # Original MRI-linac files to be analysed (change file names/location as appropriate): 
-ToOrientateFH="./YZ_HF-FH/SE_YZ_FH.nii.gz" 
-ToOrientateHF="./YZ_HF-FH/SE_YZ_HF.nii.gz" 
+ToOrientateFH="./YZ_HF-FH/SE_YZ_FH.nii.gz"
+ToOrientateHF="./YZ_HF-FH/SE_YZ_HF.nii.gz"
 
 # Definition of files for use further on: 
 NewOriginFH="./YZ_HF-FH/SE_YZ_FH_m.nii.gz"

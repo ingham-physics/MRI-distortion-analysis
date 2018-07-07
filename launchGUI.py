@@ -10,8 +10,8 @@ except ImportError:
 
 import datetime, logging, sys, os, decimal, subprocess
 
-from convert_dicom import ConvertDicomWindow
-from reorientation import ReorientationWindow
+from gui.ConvertDicomWindow import ConvertDicomWindow
+from gui.ReorientationWindow import ReorientationWindow
 
 # Log to file and stdout
 log_file_name = 'logs/'+datetime.datetime.today().strftime('%Y')+'/'+datetime.datetime.today().strftime('%m')+'/MRIDA_'+datetime.datetime.today().strftime('%Y-%m-%d_%H_%M_%S')+'.log'
@@ -88,7 +88,7 @@ if __name__ == "__main__":
         Application(root).pack(side="top", fill="both", expand=True)
 
         root.mainloop()
-
+        
     except Exception as e:
 
         logging.exception("MRI Distortion Analysis Crash")
