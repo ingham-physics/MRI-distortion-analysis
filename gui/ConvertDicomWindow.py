@@ -79,7 +79,7 @@ class ConvertDicomWindow:
             return
 
         # Create the output directory if it doesn't already exist
-        output_dir = 'working/step1'
+        output_dir = os.path.join(self.parent.workspace,'step1')
         try:
             # Python 3
             os.makedirs(output_dir, exist_ok=True) # > Python 3.2

@@ -86,7 +86,7 @@ class ReorientationWindow:
         if len(input_files) > 0:
 
             # Create the output directory if it doesn't already exist
-            output_dir = 'working/step2'
+            output_dir = os.path.join(self.parent.workspace,'step2')
             try:
                 # Python 3
                 os.makedirs(output_dir, exist_ok=True) # > Python 3.2
@@ -99,7 +99,7 @@ class ReorientationWindow:
                         raise
 
         for input_file in input_files:
-            output_file = reorient(input_file,'working/step2')
+            output_file = reorient(input_file,output_dir)
             self.reoriented_files.append(output_file)
 
         messagebox.showinfo("Done", "Reorientation Completed")

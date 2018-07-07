@@ -2,11 +2,15 @@
 try:
     # Python 2
     import Tkinter  as tk
+    import ttk
     import tkMessageBox as messagebox
+    import tkFileDialog as filedialog
 except ImportError:
     # Python 3
     import tkinter as tk
+    from tkinter import ttk
     from tkinter import messagebox
+    from tkinter import filedialog
 
 import datetime, logging, sys, os, decimal, subprocess
 
@@ -54,22 +58,33 @@ class Application(tk.Frame):
 
         self.parent = parent
 
-        tk.Label(self, text="MRI Distortion Analysis", font=("Helvetica", 16)).grid(row=1, padx=5, pady=5)
+        tk.Label(self, text="MRI Distortion Analysis", font=("Helvetica", 16)).grid(row=1, padx=10, pady=10)
 
-        tk.Button(self,text='Step 1: Convert DICOM Files', command=self.convert_dicom, width=30, height=2).grid(row=2, padx=5, pady=5)
-        tk.Button(self,text='Step 2: Reorientation', command=self.reorientation, width=30, height=2).grid(row=3, padx=5, pady=5)
+        workspaceFrame = ttk.Labelframe(self, text='Workspace')
+        workspaceFrame.grid(row=2, padx=15, pady=15)
+
+        self.str_workspace = tk.StringVar()
+        tk.Label(workspaceFrame,textvariable=self.str_workspace, font=("Helvetica", 10)).grid(row=1, padx=15, pady=15)
+        self.workspace = os.path.join(os.getcwd(),'working')
+        self.set_workspace(self.workspace)
+        tk.Button(workspaceFrame,text='Change Workspace', command=self.change_workspace).grid(row=2, padx=5, pady=5)
+
+
+        tk.Button(self,text='Step 1: Convert DICOM Files', command=self.convert_dicom, width=30, height=2).grid(row=5, padx=10, pady=10)
+        tk.Button(self,text='Step 2: Reorientation', command=self.reorientation, width=30, height=2).grid(row=6, padx=10, pady=10)
+        tk.Button(self,text='Step 3: Masking', command=self.reorientation, width=30, height=2, state=tk.DISABLED).grid(row=7, padx=10, pady=10)
+        tk.Button(self,text='Step 4: Rigid Registration', command=self.reorientation, width=30, height=2, state=tk.DISABLED).grid(row=8, padx=10, pady=10)
+        tk.Button(self,text='Step 5: Crop', command=self.reorientation, width=30, height=2, state=tk.DISABLED).grid(row=9, padx=10, pady=10)
+        tk.Button(self,text='Step 6: Deformable Registration', command=self.reorientation, width=30, height=2, state=tk.DISABLED).grid(row=10, padx=10, pady=10)
+        tk.Button(self,text='Step 7: Masking', command=self.reorientation, width=30, height=2, state=tk.DISABLED).grid(row=11, padx=10, pady=10)
+        tk.Button(self,text='Step 8: Analysis', command=self.reorientation, width=30, height=2, state=tk.DISABLED).grid(row=12, padx=10, pady=10)
 
         self.columnconfigure(0, weight=1)
-        self.rowconfigure(6, weight=1)
+        self.rowconfigure(1, weight=1)
 
         # Prepare Windows
         self.convert_dicom_window = ConvertDicomWindow(self)
         self.reorientation_window = ReorientationWindow(self)
-
-    def add_file(self):
-
-        self.directory = os.path.normpath(filedialog.askdirectory(parent=self))
-        self.listbox_paths.insert(tk.END, self.directory)
 
     def convert_dicom(self):
         self.convert_dicom_window.show()
@@ -77,13 +92,25 @@ class Application(tk.Frame):
     def reorientation(self):
         self.reorientation_window.show()
 
+    def change_workspace(self):
+        file = filedialog.askdirectory(parent=self, initialdir=self.workspace)
+        if not type(file)==str or len(file) == 0:
+            # Dialog cancelled
+            return
+        self.workspace = os.path.normpath(file)
+        self.set_workspace(self.workspace)
+
+    def set_workspace(self, ws):
+        ws = (ws[:10] + '...' + ws[len(ws)-30:]) if len(ws) > 40 else ws
+        self.str_workspace.set(ws)
+
 # If running main function, launch MainApplication window
 if __name__ == "__main__":
 
     try:
         root = tk.Tk()
         root.title('MRI Distortion Analysis')
-        root.geometry('400x600')
+        root.geometry('400x680')
 
         Application(root).pack(side="top", fill="both", expand=True)
 
