@@ -42,6 +42,8 @@ def reorient(input_file, output_path):
     file_linac_x3 = file_base + "_Linacx3.nii.gz"
     subprocess.call(["milxImageConverter", file_x3, file_linac_x3, "--componentType", "4"])
 
+    logger.info('Reorientation complete')
+
     # Return the reoriented file
     return file_linac_x3
 

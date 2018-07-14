@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 try:
     # Python 2
-    import Tkinter  as tk
+    import Tkinter as tk
     import ttk
     import tkMessageBox as messagebox
     import tkFileDialog as filedialog
@@ -16,6 +16,7 @@ import datetime, logging, sys, os, decimal, subprocess
 
 from gui.ConvertDicomWindow import ConvertDicomWindow
 from gui.ReorientationWindow import ReorientationWindow
+from gui.DeformationWindow import DeformationWindow
 
 # Log to file and stdout
 log_file_name = 'logs/'+datetime.datetime.today().strftime('%Y')+'/'+datetime.datetime.today().strftime('%m')+'/MRIDA_'+datetime.datetime.today().strftime('%Y-%m-%d_%H_%M_%S')+'.log'
@@ -75,7 +76,7 @@ class Application(tk.Frame):
         tk.Button(self,text='Step 3: Masking', command=self.reorientation, width=30, height=2, state=tk.DISABLED).grid(row=7, padx=10, pady=10)
         tk.Button(self,text='Step 4: Rigid Registration', command=self.reorientation, width=30, height=2, state=tk.DISABLED).grid(row=8, padx=10, pady=10)
         tk.Button(self,text='Step 5: Crop', command=self.reorientation, width=30, height=2, state=tk.DISABLED).grid(row=9, padx=10, pady=10)
-        tk.Button(self,text='Step 6: Deformable Registration', command=self.reorientation, width=30, height=2, state=tk.DISABLED).grid(row=10, padx=10, pady=10)
+        tk.Button(self,text='Step 6: Deformable Registration', command=self.deformation, width=30, height=2).grid(row=10, padx=10, pady=10)
         tk.Button(self,text='Step 7: Masking', command=self.reorientation, width=30, height=2, state=tk.DISABLED).grid(row=11, padx=10, pady=10)
         tk.Button(self,text='Step 8: Analysis', command=self.reorientation, width=30, height=2, state=tk.DISABLED).grid(row=12, padx=10, pady=10)
 
@@ -85,12 +86,16 @@ class Application(tk.Frame):
         # Prepare Windows
         self.convert_dicom_window = ConvertDicomWindow(self)
         self.reorientation_window = ReorientationWindow(self)
+        self.deformation_window = DeformationWindow(self)
 
     def convert_dicom(self):
         self.convert_dicom_window.show()
 
     def reorientation(self):
         self.reorientation_window.show()
+
+    def deformation(self):
+        self.deformation_window.show()
 
     def change_workspace(self):
         file = filedialog.askdirectory(parent=self, initialdir=self.workspace)
