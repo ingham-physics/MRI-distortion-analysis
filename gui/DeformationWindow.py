@@ -32,7 +32,7 @@ class DeformationWindow:
 
         self.top = tk.Toplevel(self.parent)
         self.top.title('Deformation')
-        self.top.geometry('600x540')
+        self.top.geometry('600x600')
         self.top.update()
         self.top.minsize(self.top.winfo_width(), self.top.winfo_height())
         self.top.resizable(True, True)
@@ -54,13 +54,20 @@ class DeformationWindow:
         tk.Button(target_frame,text='Choose Target File', command=self.choose_target_file).grid(row=2, padx=5, pady=5)
 
         self.grid_spacing = tk.StringVar()
-        self.grid_spacing.set("5")
+        self.grid_spacing.set("25")
         grid_spacing_frame = ttk.Labelframe(self.top, text='Grid Spacing (mm)')
         grid_spacing_frame.grid(row=2, padx=15, pady=15, sticky="ew")
         tk.Label(grid_spacing_frame,textvariable=self.grid_spacing, font=("Helvetica", 10)).grid(row=1, padx=15, pady=15)
         tk.Button(grid_spacing_frame,text='Change Grid Spacing', command=self.change_grid_spacing).grid(row=2, padx=5, pady=5)
 
-        tk.Button(self.top,text='Deform', command=self.deform, width=30, height=2).grid(row=3, padx=5, pady=5)
+        self.threshold = tk.StringVar()
+        self.threshold.set("100")
+        threshold_frame = ttk.Labelframe(self.top, text='Threshold')
+        threshold_frame.grid(row=3, padx=15, pady=15, sticky="ew")
+        tk.Label(threshold_frame,textvariable=self.threshold, font=("Helvetica", 10)).grid(row=1, padx=15, pady=15)
+        tk.Button(threshold_frame,text='Change Threshold', command=self.change_threshold).grid(row=2, padx=5, pady=5)
+
+        tk.Button(self.top,text='Deform', command=self.deform, width=30, height=2).grid(row=4, padx=5, pady=5)
 
         self.top.columnconfigure(0, weight=1)
         self.top.rowconfigure(5, weight=1)
@@ -92,6 +99,19 @@ class DeformationWindow:
             return
         self.grid_spacing.set(str(gs))
 
+    def change_threshold(self):
+        
+        th = simpledialog.askinteger("Threshold", "Enter the threshold",
+                                 parent=self.top,
+                                 minvalue=0, maxvalue=1000,
+                                 initialvalue=int(self.threshold.get())
+                                 )
+
+        if th == None:
+            # Dialog cancelled
+            return
+        self.threshold.set(str(th))
+
     def deform(self):
 
         # Create the output directory if it doesn't already exist
@@ -107,7 +127,7 @@ class DeformationWindow:
                 if not os.path.isdir(output_dir):
                     raise
 
-        output_file = mrl_deformable(self.source_file.get(),self.target_file.get(), output_dir, int(self.grid_spacing.get()))
+        output_file = mrl_deformable(self.source_file.get(),self.target_file.get(), output_dir, int(self.grid_spacing.get()), int(self.threshold.get()))
         self.deformed_files.append(output_file)
 
         messagebox.showinfo("Done", "Deformation Completed")
