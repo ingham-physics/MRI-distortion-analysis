@@ -20,7 +20,7 @@ def reorient(input_file, output_path):
 
     # Change the orientation to look like a conventional scan:
     file_new_origin = file_base + "_m.nii.gz"
-    subprocess.call(["milxImageEditInformation", input_file, file_new_origin, "-m -0 -1 0 1 -0 0 0 0 -1"])
+    subprocess.call(["milxImageEditInformation", input_file, file_new_origin, "-m", "-0", "-1", "0", "1", "-0", "0", "0", "0", "-1"])
     
     # No-orientate the images: 
     file_no_orient = file_base + "_nO.nii.gz"
