@@ -12,15 +12,9 @@ mkdir -p $OUT_DIR
 
 #Rigid reg with Aladin: 
 BIN="/Dev/nifty_reg-1.3.9/nifty_reg/reg-apps/reg_aladin"
-reg_aladin -ref "$IMG_T" -flo "$IMG_S" -res "${OUT_PREFX2}-Aladin.nii.gz" -rigOnly #-"${OUT_PREFX2}-Aladin.tfm"
+reg_aladin -ref "$IMG_T" -flo "$IMG_S" -res "${OUT_PREFX2}-Aladin.nii.gz" -rigOnly -aff "${OUT_PREFX2}-Aladin.txt"
 
 #RegRig + ' -ref ' + refImg + ' -flo ' + movImg + ' -res ' + rigResult + ' -rigOnly -aff ' + rigTfm  
-
-#BIN="/home/amy/Dev/milx-view/build/bin/milxAliBaba"
-#mirorr -t rigid -f "$IMG_T" -m "$IMG_S" -a 0 -c 3 -n 0 --save-moving "${OUT_PREFX}-Result.nii.gz" -l "${OUT_PREFX}-Result.tfm" --fresh --do-not-register 
-
-#BIN="/home/amy/Dev/milx-view/build/bin/milxAliBaba"
-#mirorr -t rigid -f "$IMG_T" -m "${OUT_PREFX}-Result.nii.gz" -a 0 -c 3 -n 0 --save-moving "${OUT_PREFX2}-Result.nii.gz" -l "${OUT_PREFX2}-Result.tfm" --fresh 
 
 DEnd=`date`
 echo Started on: $DStart
