@@ -17,6 +17,7 @@ import datetime, logging, sys, os, decimal, subprocess
 from gui.ConvertDicomWindow import ConvertDicomWindow
 from gui.ReorientationWindow import ReorientationWindow
 from gui.DeformationWindow import DeformationWindow
+from gui.AnalysisWindow import AnalysisWindow
 
 # Log to file and stdout
 log_file_name = 'logs/'+datetime.datetime.today().strftime('%Y')+'/'+datetime.datetime.today().strftime('%m')+'/MRIDA_'+datetime.datetime.today().strftime('%Y-%m-%d_%H_%M_%S')+'.log'
@@ -78,7 +79,7 @@ class Application(tk.Frame):
         tk.Button(self,text='Step 5: Crop', command=self.reorientation, width=30, height=2, state=tk.DISABLED).grid(row=9, padx=10, pady=10)
         tk.Button(self,text='Step 6: Deformable Registration', command=self.deformation, width=30, height=2).grid(row=10, padx=10, pady=10)
         tk.Button(self,text='Step 7: Masking', command=self.reorientation, width=30, height=2, state=tk.DISABLED).grid(row=11, padx=10, pady=10)
-        tk.Button(self,text='Step 8: Analysis', command=self.reorientation, width=30, height=2, state=tk.DISABLED).grid(row=12, padx=10, pady=10)
+        tk.Button(self,text='Step 8: Analysis', command=self.analysis, width=30, height=2).grid(row=12, padx=10, pady=10)
 
         self.columnconfigure(0, weight=1)
         self.rowconfigure(1, weight=1)
@@ -87,6 +88,7 @@ class Application(tk.Frame):
         self.convert_dicom_window = ConvertDicomWindow(self)
         self.reorientation_window = ReorientationWindow(self)
         self.deformation_window = DeformationWindow(self)
+        self.analysis_window = AnalysisWindow(self)
 
     def convert_dicom(self):
         self.convert_dicom_window.show()
@@ -96,6 +98,9 @@ class Application(tk.Frame):
 
     def deformation(self):
         self.deformation_window.show()
+
+    def analysis(self):
+        self.analysis_window.show()
 
     def change_workspace(self):
         file = filedialog.askdirectory(parent=self, initialdir=self.workspace)
