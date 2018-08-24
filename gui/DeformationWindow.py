@@ -127,8 +127,9 @@ class DeformationWindow:
                 if not os.path.isdir(output_dir):
                     raise
 
-        output_file = mrl_deformable(self.source_file.get(),self.target_file.get(), output_dir, int(self.grid_spacing.get()), int(self.threshold.get()))
-        self.deformed_files.append(output_file)
+        csv_file, def_file = mrl_deformable(self.source_file.get(),self.target_file.get(), output_dir, int(self.grid_spacing.get()), int(self.threshold.get()))
+        self.deformed_files.append(csv_file)
+        self.deformed_files.append(def_file)
 
         messagebox.showinfo("Done", "Deformation Completed")
 

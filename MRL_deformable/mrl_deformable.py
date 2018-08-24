@@ -45,8 +45,8 @@ def mrl_deformable(source_file, target_file, output_path, grid_spacing=25, thres
 
     logger.info('Deformation complete')
 
-    # Return masked csv
-    return file_masked_csv
+    # Return masked csv and the masked deformation field
+    return file_masked_csv, file_masked_df
 
 # Runs when this script is executed directly from the commmand line
 if __name__ == "__main__":
