@@ -62,8 +62,8 @@ def perform_analysis(def_csv_file, output_dir, iso=[0,0,0], px_spacing=[1,1,1], 
 
     # Scatter plot
     plt.scatter(dists_from_iso, mags)
-    plt.xlabel("Distance from ISO")
-    plt.ylabel("Vector Magnitude")
+    plt.xlabel("Distance from ISO (mm)")
+    plt.ylabel("Total Distortion (mm)")
     plt.show()
 
     logger.info('Analysis complete')
