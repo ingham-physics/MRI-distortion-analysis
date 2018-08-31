@@ -22,8 +22,8 @@ y="-250"
 z="250"
 
 # Change the orientation to look like a conventional scan: 
-milxImageEditInformation "$ToOrientateFH" "$NewOriginFH" -m -0 -1 0 1 -0 0 0 0 -1
-milxImageEditInformation "$ToOrientateHF" "$NewOriginHF" -m -0 -1 0 1 -0 0 0 0 -1
+milxImageEditInformation "$ToOrientateFH" "$NewOriginFH" -m -0 1 0 1 -0 0 0 0 -1
+milxImageEditInformation "$ToOrientateHF" "$NewOriginHF" -m -0 1 0 1 -0 0 0 0 -1
 
 # No-orientate the images: 
 milxImageOperations -u "$NewOriginFH" "$NoOrientFH"
