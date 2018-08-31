@@ -59,39 +59,6 @@ class AnalysisWindow:
             return
         self.source_file.set(os.path.normpath(file))
 
-    def choose_target_file(self):
-        file = filedialog.askopenfilename(parent=self.top, initialdir=self.target_file.get())
-        if not type(file)==str or len(file) == 0:
-            # Dialog cancelled
-            return
-        self.target_file.set(os.path.normpath(file))
-
-    def change_grid_spacing(self):
-        
-        gs = simpledialog.askinteger("Grid Spacing", "Enter the spline grid spacing in mm",
-                                 parent=self.top,
-                                 minvalue=0, maxvalue=100,
-                                 initialvalue=int(self.grid_spacing.get())
-                                 )
-
-        if gs == None:
-            # Dialog cancelled
-            return
-        self.grid_spacing.set(str(gs))
-
-    def change_threshold(self):
-        
-        th = simpledialog.askinteger("Threshold", "Enter the threshold",
-                                 parent=self.top,
-                                 minvalue=0, maxvalue=1000,
-                                 initialvalue=int(self.threshold.get())
-                                 )
-
-        if th == None:
-            # Dialog cancelled
-            return
-        self.threshold.set(str(th))
-
     def analyse(self):
 
         # Create the output directory if it doesn't already exist
