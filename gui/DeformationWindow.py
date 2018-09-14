@@ -131,6 +131,6 @@ class DeformationWindow:
         self.deformed_files.append(csv_file)
         self.deformed_files.append(def_file)
 
-        messagebox.showinfo("Done", "Deformation Completed")
+        messagebox.showinfo("Done", "Deformation Completed", parent=self.top)
 
         self.top.destroy()

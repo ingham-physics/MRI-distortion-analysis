@@ -73,8 +73,8 @@ class AnalysisWindow:
 
         # Add the files from the previous steps
         try:
-            csv_file.set(self.parent.analysis_window.deformed_files[0])
-            csv_file.set(self.parent.analysis_window.deformed_files[1])
+            self.csv_file.set(self.parent.analysis_window.deformed_files[0])
+            self.csv_file.set(self.parent.analysis_window.deformed_files[1])
         except:
             # User hasn't run previous step
             pass
@@ -89,7 +89,31 @@ class AnalysisWindow:
             return
         self.csv_file.set(os.path.normpath(file))
 
+    def choose_def_file(self):
+        file = filedialog.askopenfilename(parent=self.top, initialdir=self.def_file.get())
+        if not type(file)==str or len(file) == 0:
+            # Dialog cancelled
+            return
+        self.def_file.set(os.path.normpath(file))
+
     def analyse(self):
+
+        # Validate input CSV
+        if not os.path.isfile(self.csv_file.get()):
+            messagebox.showerror("Error", "Registration CSV file not found", parent=self.top)
+            return
+
+        # Validate input Deformation file
+        if not os.path.isfile(self.def_file.get()):
+            messagebox.showerror("Error", "Deformation file not found", parent=self.top)
+            return
+
+        # Validate ISO Centre
+        try:
+            iso = [float(self.iso_x.get()), float(self.iso_y.get()), float(self.iso_z.get())]
+        except ValueError:
+            messagebox.showerror("Error", "Ensure ISO Center is entered correctly", parent=self.top)
+            return
 
         # Create the output directory if it doesn't already exist
         output_dir = os.path.join(self.parent.workspace,'step8')
@@ -106,6 +130,6 @@ class AnalysisWindow:
 
         perform_analysis(self.csv_file.get(), output_dir, iso, def_file=self.def_file.get())
 
-        messagebox.showinfo("Done", "Analysis Completed")
+        messagebox.showinfo("Done", "Analysis Completed", parent=self.top)
 
         self.top.destroy()

@@ -75,7 +75,7 @@ class ConvertDicomWindow:
 
         # Make sure the user has selected at least one directory
         if len(dicom_paths) == 0:
-            messagebox.showerror("Select Directory", "Add at least one directory containing the Dicom files to convert.")
+            messagebox.showerror("Select Directory", "Add at least one directory containing the Dicom files to convert.", parent=self.top)
             return
 
         # Create the output directory if it doesn't already exist
@@ -114,9 +114,9 @@ class ConvertDicomWindow:
         
         # Finally show a message describing which files were successfully converted
         if files_converted_success:
-            messagebox.showinfo("Success", "Files converted successfully")
+            messagebox.showinfo("Success", "Files converted successfully", parent=self.top)
 
             # Close the window
             self.top.destroy()
         else:
-            messagebox.showerror("Error", "Unable to convert some files. Ensure that paths contain Dicom series.")
+            messagebox.showerror("Error", "Unable to convert some files. Ensure that paths contain Dicom series.", parent=self.top)

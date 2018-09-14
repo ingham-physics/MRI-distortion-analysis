@@ -102,6 +102,6 @@ class ReorientationWindow:
             output_file = reorient(input_file,output_dir)
             self.reoriented_files.append(output_file)
 
-        messagebox.showinfo("Done", "Reorientation Completed")
+        messagebox.showinfo("Done", "Reorientation Completed", parent=self.top)
 
         self.top.destroy()
