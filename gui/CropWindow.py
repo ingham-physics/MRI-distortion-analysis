@@ -6,7 +6,8 @@ from numpy import arange, sin, pi
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
 from matplotlib.backend_bases import key_press_handler
 from matplotlib.figure import Figure
-from pylab import *
+from matplotlib.gridspec import GridSpec
+
 try:
     # Python 2
     import Tkinter  as tk
@@ -57,16 +58,19 @@ class CropWindow:
 
         plot_frame = ttk.Labelframe(self.top, text='Crop Image')
         plot_frame.grid(row=1, padx=15, pady=15, sticky="ew")
-        #tk.Label(source_frame,textvariable=self.source_file, font=("Helvetica", 10)).grid(row=1, padx=15, pady=15)
-        #tk.Button(source_frame,text='Choose Registration CSV File', command=self.choose_source_file).grid(row=2, padx=5, pady=5)
-
         self.xFrom = tk.StringVar()
+        self.xFrom.trace("w", lambda name, index, mode, sv=self.xFrom: self.update_selection())
         self.xTo = tk.StringVar()
+        self.xTo.trace("w", lambda name, index, mode, sv=self.xTo: self.update_selection())
         self.yFrom = tk.StringVar()
+        self.yFrom.trace("w", lambda name, index, mode, sv=self.yFrom: self.update_selection())
         self.yTo = tk.StringVar()
+        self.yTo.trace("w", lambda name, index, mode, sv=self.yTo: self.update_selection())
         self.zFrom = tk.StringVar()
+        self.zFrom.trace("w", lambda name, index, mode, sv=self.zFrom: self.update_selection())
         self.zTo = tk.StringVar()
-        param_frame = ttk.Labelframe(self.top, text='Cropping Parameters')
+        self.zTo.trace("w", lambda name, index, mode, sv=self.zTo: self.update_selection())
+        param_frame = ttk.Labelframe(self.top, text='Cropping Parameters (Voxels)')
         param_frame.grid(row=3, padx=15, pady=15, sticky="ew")
         tk.Label(param_frame,text='X', font=("Helvetica", 10)).grid(row=1, column=2, padx=0, pady=0)
         tk.Label(param_frame,text='Y', font=("Helvetica", 10)).grid(row=1, column=3, padx=0, pady=0)
@@ -85,13 +89,37 @@ class CropWindow:
         self.top.columnconfigure(0, weight=1)
         self.top.rowconfigure(1, weight=1)
 
-        fig = Figure(figsize=(5, 5), dpi=100)
-        self.axAx = fig.add_subplot(2,2,1)
-        self.axCor = fig.add_subplot(2,2,2)
-        self.axSag = fig.add_subplot(2,2,3)
+        fig = Figure(figsize=(50, 50), dpi=75)
+        rect = fig.patch
+        rect.set_facecolor("lightgray")
+        gs = GridSpec(2, 2)
+        gs.update(wspace=0.000025, hspace=0.0005)
+
+        self.axAx = fig.add_subplot(gs[0], frameon=False)
+        self.axAx.get_xaxis().set_visible(False)
+        self.axAx.get_yaxis().set_visible(False)
+
+        self.axCor = fig.add_subplot(gs[1], frameon=False)
+        self.axCor.get_xaxis().set_visible(False)
+        self.axCor.get_yaxis().set_visible(False)
+
+        self.axSag = fig.add_subplot(gs[2], frameon=False)
+        self.axSag.get_xaxis().set_visible(False)
+        self.axSag.get_yaxis().set_visible(False)
+
+        fig.subplots_adjust(bottom=0.05, top=0.95, left=0, right=1)   
 
         self.canvas = FigureCanvasTkAgg(fig, master=plot_frame)
         self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+
+        # Add the file from the previous step
+        try:
+            f = self.parent.reorientation_window.reoriented_files[0]
+            self.source_file.set(os.path.normpath(f))
+            self.load_image()
+        except:
+            # User hasn't run previous step
+            pass
 
     def rect_selected(self, rect, axis):
 
@@ -110,29 +138,70 @@ class CropWindow:
             self.yTo.set(int(rect[1][0]))
             self.zFrom.set(int(rect[0][1]))
             self.zTo.set(int(rect[1][1]))
-            
+
+        self.update_selection()
+
+    def update_selection(self):
+    
+        try:
+            self.imAx.set_selected_region(
+                int(self.xFrom.get()),
+                int(self.yFrom.get()),
+                int(self.zFrom.get()),
+                int(self.xTo.get()), 
+                int(self.yTo.get()), 
+                int(self.zTo.get()))
+
+            self.imCor.set_selected_region(
+                int(self.xFrom.get()),
+                int(self.zFrom.get()),
+                int(self.yFrom.get()),
+                int(self.xTo.get()), 
+                int(self.zTo.get()), 
+                int(self.yTo.get()))
+
+            self.imSag.set_selected_region(
+                int(self.yFrom.get()), 
+                int(self.zFrom.get()), 
+                int(self.xFrom.get()), 
+                int(self.yTo.get()), 
+                int(self.zTo.get()), 
+                int(self.xTo.get()))
+        except AttributeError:
+            # Occurs when no image has been loaded yet
+            # We can safely ignore
+            pass
+        except ValueError:
+            # Occurs when an invalid character is entered
+            pass
+
+
+
     def load_image(self):
 
         try:
-            img=sitk.ReadImage(self.source_file.get())
+            self.img=sitk.ReadImage(self.source_file.get())
         except:
             print('File read failed ' + self.source_file.get() )
-            raise
+            messagebox.showerror("Error", "An error occurred while reading the input file", parent=self.top)
+            return
+        
+        self.imAx = ImageAxes(0, self.axAx, self.img, self.rect_selected)
+        self.imCor = ImageAxes(1, self.axCor, self.img, self.rect_selected)
+        self.imSag = ImageAxes(2, self.axSag, self.img, self.rect_selected)
+        self.canvas.draw()
+        self.canvas.mpl_connect('scroll_event', self.imAx.onscroll)
+        self.canvas.mpl_connect('scroll_event', self.imCor.onscroll)
+        self.canvas.mpl_connect('scroll_event', self.imSag.onscroll)
 
         self.xFrom.set('0')
-        self.xTo.set(str(img.GetWidth()))
+        self.xTo.set(str(self.img.GetWidth()))
 
         self.yFrom.set('0')
-        self.yTo.set(str(img.GetHeight()))
+        self.yTo.set(str(self.img.GetHeight()))
 
         self.zFrom.set('0')
-        self.zTo.set(str(img.GetDepth()))
-        
-        self.imAx = ImageAxes(0, self.axAx, img, self.rect_selected)
-        self.imCor = ImageAxes(1, self.axCor, img, self.rect_selected)
-        self.imSag = ImageAxes(2, self.axSag, img, self.rect_selected)
-        self.canvas.draw()
-
+        self.zTo.set(str(self.img.GetDepth()))
 
     def choose_source_file(self):
         file = filedialog.askopenfilename(parent=self.top, initialdir=self.source_file.get())
@@ -145,8 +214,13 @@ class CropWindow:
 
     def crop(self):
 
+        # Set output file name
+        if len(self.source_file.get()) == 0:
+            messagebox.showwarning("No Image", "No image loaded", parent=self.top)
+            return
+
         # Create the output directory if it doesn't already exist
-        output_dir = os.path.join(self.parent.workspace,'step6')
+        output_dir = os.path.join(self.parent.workspace,'step5')
         try:
             # Python 3
             os.makedirs(output_dir, exist_ok=True) # > Python 3.2
@@ -158,8 +232,32 @@ class CropWindow:
                 if not os.path.isdir(output_dir):
                     raise
 
-        perform_analysis(self.source_file.get())
+        # Determine output file name
+        path, filename = os.path.split(self.source_file.get())
+        file_base = os.path.join(output_dir, filename.split('.')[0])
+        output_file = file_base + '_cropped.nii.gz'
 
-        messagebox.showinfo("Done", "Analysis Completed")
+        # Crop the image
+        crop = sitk.CropImageFilter()
+
+        lowerBoundary = [int(self.xFrom.get()),
+            int(self.yFrom.get()),
+            int(self.zFrom.get())]
+        crop.SetLowerBoundaryCropSize(lowerBoundary)
+
+        size = self.img.GetSize()
+        upperBoundary = [size[0]-int(self.xTo.get()),
+            size[1]-int(self.yTo.get()),
+            size[2]-int(self.zTo.get())]
+        crop.SetUpperBoundaryCropSize(upperBoundary)
+
+        cropped_image = crop.Execute ( self.img )
+
+        # Save the file
+        writer = sitk.ImageFileWriter()
+        writer.SetFileName ( output_file )
+        writer.Execute ( cropped_image )
+
+        messagebox.showinfo("Done", "Image Cropped", parent=self.top)
 
         self.top.destroy()
