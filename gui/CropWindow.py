@@ -41,7 +41,7 @@ class CropWindow:
 
         self.top = tk.Toplevel(self.parent)
         self.top.title('Crop')
-        self.top.geometry('600x800')
+        self.top.geometry('600x1000')
         self.top.update()
         self.top.minsize(self.top.winfo_width(), self.top.winfo_height())
         self.top.resizable(True, True)
@@ -50,27 +50,33 @@ class CropWindow:
 
         self.top.attributes("-topmost", True)
 
-        self.source_file = tk.StringVar()
-        source_frame = ttk.Labelframe(self.top, text='Image file to crop')
-        source_frame.grid(row=0, padx=15, pady=15, sticky="ew")
-        tk.Label(source_frame,textvariable=self.source_file, font=("Helvetica", 10)).grid(row=1, padx=15, pady=15)
-        tk.Button(source_frame,text='Choose Image File', command=self.choose_source_file).grid(row=2, padx=5, pady=5)
+        filesFrame = ttk.Labelframe(self.top, text='File Paths')
+        filesFrame.grid(row=0, padx=5, pady=5, sticky="news")
+        filesFrame.rowconfigure(1, weight=1)
+
+        self.listbox_paths = tk.Listbox(filesFrame)
+        self.listbox_paths.grid(row=1, columnspan=1, padx=(5,0), pady=5, sticky='news')
+        self.listbox_paths.bind("<<ListboxSelect>>", self.select_file)
+        self.selection = self.listbox_paths.curselection()
+
+        vsb = ttk.Scrollbar(filesFrame, orient="vertical", command=self.listbox_paths.yview)
+        vsb.grid(row=1, column=2, sticky=("N", "S", "E", "W"), padx=(0,10), pady=(5, 5))
+        self.listbox_paths.configure(yscrollcommand=vsb.set)
+
+        filesFrame.columnconfigure(0, weight=1)
+
+        tk.Button(filesFrame,text='Add File', command=self.add_file, width=20).grid(row=0, padx=5, pady=5)
+        tk.Button(filesFrame,text='Remove Selected', command=self.remove_file, width=20).grid(row=2, padx=5, pady=5)
 
         plot_frame = ttk.Labelframe(self.top, text='Crop Image')
         plot_frame.grid(row=1, padx=15, pady=15, sticky="ew")
         self.strVarXfrom = tk.StringVar()
-        #self.strVarXfrom.trace("w", lambda name, index, mode, sv=self.strVarXfrom: self.update_selection())
         self.strVarXto = tk.StringVar()
-        #self.strVarXto.trace("w", lambda name, index, mode, sv=self.strVarXto: self.update_selection())
         self.strVarYfrom = tk.StringVar()
-        #self.strVarYfrom.trace("w", lambda name, index, mode, sv=self.strVarYfrom: self.update_selection())
         self.strVarYto = tk.StringVar()
-        #self.strVarYto.trace("w", lambda name, index, mode, sv=self.strVarYto: self.update_selection())
         self.strVarZfrom = tk.StringVar()
-        #self.strVarZfrom.trace("w", lambda name, index, mode, sv=self.strVarZfrom: self.update_selection())
         self.strVarZto = tk.StringVar()
-        #self.strVarZto.trace("w", lambda name, index, mode, sv=self.strVarZto: self.update_selection())
-        param_frame = ttk.Labelframe(self.top, text='Cropping Parameters (Voxels)')
+        param_frame = ttk.Labelframe(self.top, text='Cropping Parameters')
         param_frame.grid(row=3, padx=15, pady=15, sticky="ew")
         tk.Label(param_frame,text='X', font=("Helvetica", 10)).grid(row=1, column=2, padx=0, pady=0)
         tk.Label(param_frame,text='Y', font=("Helvetica", 10)).grid(row=1, column=3, padx=0, pady=0)
@@ -138,23 +144,31 @@ class CropWindow:
         self.canvas = FigureCanvasTkAgg(fig, master=plot_frame)
         self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
 
-        # Add the file from the previous step
+        # Add the files from the previous steps
         try:
-            f = self.parent.reorientation_window.reoriented_files[0]
-            self.source_file.set(os.path.normpath(f))
-            self.load_image()
+            for f in self.parent.reorientation_window.reoriented_files:
+                self.insert_file(f)
         except:
             # User hasn't run previous step
             pass
 
+    def select_file(self, a):
+        if len(self.listbox_paths.curselection()) > 3:
+            for i in self.listbox_paths.curselection():
+                if i not in self.selection:
+                    self.listbox_paths.selection_clear(i)
+        self.selection = self.listbox_paths.curselection()
+
+        self.load_image(self.listbox_paths.get(self.listbox_paths.curselection()))
+
     def update_units(self):
         if self.units.get() == 1: # mm
-            self.strVarXfrom.set(str(self.physFrom[0]))
-            self.strVarXto.set(str(self.physTo[0]))
-            self.strVarYfrom.set(str(self.physFrom[1]))
-            self.strVarYto.set(str(self.physTo[1]))
-            self.strVarZfrom.set(str(self.physFrom[2]))
-            self.strVarZto.set(str(self.physTo[2]))
+            self.strVarXfrom.set("{:.2f}".format(self.physFrom[0]))
+            self.strVarXto.set("{:.2f}".format(self.physTo[0]))
+            self.strVarYfrom.set("{:.2f}".format(self.physFrom[1]))
+            self.strVarYto.set("{:.2f}".format(self.physTo[1]))
+            self.strVarZfrom.set("{:.2f}".format(self.physFrom[2]))
+            self.strVarZto.set("{:.2f}".format(self.physTo[2]))
         else: # voxels
             indFrom = self.img.TransformPhysicalPointToIndex(self.physFrom)
             indTo = self.img.TransformPhysicalPointToIndex(self.physTo)
@@ -176,6 +190,21 @@ class CropWindow:
 
             self.physFrom = self.img.TransformIndexToPhysicalPoint(indFrom)
             self.physTo = self.img.TransformIndexToPhysicalPoint(indTo)
+        
+        # Clamp the values to be in range of image
+        sz = self.img.GetSize()
+        indFrom = self.img.TransformPhysicalPointToIndex(self.physFrom)
+        indTo = self.img.TransformPhysicalPointToIndex(self.physTo)
+
+        indFrom = (max(indFrom[0],0), max(indFrom[1],0), max(indFrom[2],0))
+        indFrom = (min(indFrom[0],sz[0]), min(indFrom[1],sz[1]), min(indFrom[2],sz[2]))
+        indTo = (max(indTo[0],0), max(indTo[1],0), max(indTo[2],0))
+        indTo = (min(indTo[0],sz[0]), min(indTo[1],sz[1]), min(indTo[2],sz[2]))
+        
+        self.physFrom = self.img.TransformIndexToPhysicalPoint(indFrom)
+        self.physTo = self.img.TransformIndexToPhysicalPoint(indTo)
+        
+        self.update_units()
 
         self.update_selection()
 
@@ -240,14 +269,12 @@ class CropWindow:
             # Occurs when an invalid character is entered
             pass
 
-
-
-    def load_image(self):
+    def load_image(self, img_file):
 
         try:
-            self.img=sitk.ReadImage(self.source_file.get())
+            self.img=sitk.ReadImage(img_file)
         except:
-            print('File read failed ' + self.source_file.get() )
+            print('File read failed ' + img_file )
             messagebox.showerror("Error", "An error occurred while reading the input file", parent=self.top)
             return
 
@@ -263,27 +290,39 @@ class CropWindow:
         self.canvas.mpl_connect('scroll_event', self.imCor.onscroll)
         self.canvas.mpl_connect('scroll_event', self.imSag.onscroll)
 
-        self.physFrom = self.img.TransformIndexToPhysicalPoint((0,0,0))
-        print(self.img.GetSize())
-        self.physTo = self.img.TransformIndexToPhysicalPoint(self.img.GetSize())
+        if not hasattr(self, 'physFrom'):
+            self.physFrom = self.img.TransformIndexToPhysicalPoint((0,0,0))
+            self.physTo = self.img.TransformIndexToPhysicalPoint(self.img.GetSize())
 
         self.update_units()
 
-    def choose_source_file(self):
-        file = filedialog.askopenfilename(parent=self.top, initialdir=self.source_file.get())
-        if not type(file)==str or len(file) == 0:
-            # Dialog cancelled
-            return
-        self.source_file.set(os.path.normpath(file))
+        self.entry_changed()
 
-        self.load_image()
+    def insert_file(self, f):
+        self.listbox_paths.insert(tk.END, f)
+        self.listbox_paths.select_clear(0,tk.END)
+        self.listbox_paths.select_set(tk.END)
+
+        self.selection = self.listbox_paths.curselection()
+
+        self.load_image(self.listbox_paths.get(self.listbox_paths.curselection()))
+
+    def add_file(self):
+
+        f = os.path.normpath(filedialog.askopenfilename(parent=self.top))
+
+        self.insert_file(f)
+       
+    def remove_file(self):
+
+        selected_indexes = self.listbox_paths.curselection()
+
+        for ind in selected_indexes:
+            self.listbox_paths.delete(int(ind))
+
+        self.listbox_paths.select_set(tk.END)
 
     def crop(self):
-
-        # Set output file name
-        if len(self.source_file.get()) == 0:
-            messagebox.showwarning("No Image", "No image loaded", parent=self.top)
-            return
 
         # Create the output directory if it doesn't already exist
         output_dir = os.path.join(self.parent.workspace,'step5')
@@ -298,32 +337,41 @@ class CropWindow:
                 if not os.path.isdir(output_dir):
                     raise
 
-        # Determine output file name
-        path, filename = os.path.split(self.source_file.get())
-        file_base = os.path.join(output_dir, filename.split('.')[0])
-        output_file = file_base + '_cropped.nii.gz'
+        # Crop each image loaded to physical coords
+        for i, img_file in enumerate(self.listbox_paths.get(0, tk.END)):
+            logger.info('Cropping: ' + img_file)
 
-        # Crop the image
-        crop = sitk.CropImageFilter()
+            # Determine output file name
+            path, filename = os.path.split(img_file)
+            file_base = os.path.join(output_dir, filename.split('.')[0])
+            output_file = file_base + '_cropped.nii.gz'
 
-        lowerBoundary = [int(self.strVarXfrom.get()),
-            int(self.strVarYfrom.get()),
-            int(self.strVarZfrom.get())]
-        crop.SetLowerBoundaryCropSize(lowerBoundary)
 
-        size = self.img.GetSize()
-        upperBoundary = [size[0]-int(self.strVarXto.get()),
-            size[1]-int(self.strVarYto.get()),
-            size[2]-int(self.strVarZto.get())]
-        crop.SetUpperBoundaryCropSize(upperBoundary)
+            # Convert the physical coordinates to the voxels coords for this image
+            img = sitk.ReadImage(img_file)
+            indFrom = img.TransformPhysicalPointToIndex(self.physFrom)
+            indTo = img.TransformPhysicalPointToIndex(self.physTo)
 
-        cropped_image = crop.Execute ( self.img )
+            # Crop the image
+            crop = sitk.CropImageFilter()
+            lowerBoundary = [indFrom[0],
+                indFrom[1],
+                indFrom[2]]
+            crop.SetLowerBoundaryCropSize(indFrom)
 
-        # Save the file
-        writer = sitk.ImageFileWriter()
-        writer.SetFileName ( output_file )
-        writer.Execute ( cropped_image )
+            size = self.img.GetSize()
+            upperBoundary = [size[0]-indTo[0],
+                size[1]-indTo[1],
+                size[2]-indTo[2]]
+            crop.SetUpperBoundaryCropSize(upperBoundary)
 
-        messagebox.showinfo("Done", "Image Cropped", parent=self.top)
+            cropped_image = crop.Execute ( img )
+
+            # Save the file
+            writer = sitk.ImageFileWriter()
+            writer.SetFileName ( output_file )
+            writer.Execute ( cropped_image )
+
+        messagebox.showinfo("Done", "Image(s) Cropped", parent=self.top)
 
         self.top.destroy()

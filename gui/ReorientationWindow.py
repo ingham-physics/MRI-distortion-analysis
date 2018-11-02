@@ -98,6 +98,7 @@ class ReorientationWindow:
                     if not os.path.isdir(output_dir):
                         raise
 
+        self.reoriented_files = []
         for input_file in input_files:
             output_file = reorient(input_file,output_dir)
             self.reoriented_files.append(output_file)
