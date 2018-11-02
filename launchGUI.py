@@ -16,6 +16,7 @@ import datetime, logging, sys, os, decimal, subprocess
 
 from gui.ConvertDicomWindow import ConvertDicomWindow
 from gui.ReorientationWindow import ReorientationWindow
+from gui.RigidWindow import RigidWindow
 from gui.CropWindow import CropWindow
 from gui.DeformationWindow import DeformationWindow
 from gui.AnalysisWindow import AnalysisWindow
@@ -76,7 +77,7 @@ class Application(tk.Frame):
         tk.Button(self,text='Step 1: Convert DICOM Files', command=self.convert_dicom, width=30, height=2).grid(row=5, padx=10, pady=10)
         tk.Button(self,text='Step 2: Reorientation', command=self.reorientation, width=30, height=2).grid(row=6, padx=10, pady=10)
         tk.Button(self,text='Step 3: Masking', command=self.reorientation, width=30, height=2, state=tk.DISABLED).grid(row=7, padx=10, pady=10)
-        tk.Button(self,text='Step 4: Rigid Registration', command=self.reorientation, width=30, height=2, state=tk.DISABLED).grid(row=8, padx=10, pady=10)
+        tk.Button(self,text='Step 4: Rigid Registration', command=self.rigid, width=30, height=2).grid(row=8, padx=10, pady=10)
         tk.Button(self,text='Step 5: Crop', command=self.crop, width=30, height=2).grid(row=9, padx=10, pady=10)
         tk.Button(self,text='Step 6: Deformable Registration', command=self.deformation, width=30, height=2).grid(row=10, padx=10, pady=10)
         tk.Button(self,text='Step 7: Masking', command=self.reorientation, width=30, height=2, state=tk.DISABLED).grid(row=11, padx=10, pady=10)
@@ -88,6 +89,7 @@ class Application(tk.Frame):
         # Prepare Windows
         self.convert_dicom_window = ConvertDicomWindow(self)
         self.reorientation_window = ReorientationWindow(self)
+        self.rigid_window = RigidWindow(self)
         self.crop_window = CropWindow(self)
         self.deformation_window = DeformationWindow(self)
         self.analysis_window = AnalysisWindow(self)
@@ -97,6 +99,9 @@ class Application(tk.Frame):
 
     def reorientation(self):
         self.reorientation_window.show()
+
+    def rigid(self):
+        self.rigid_window.show()
 
     def crop(self):
         self.crop_window.show()

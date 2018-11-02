@@ -73,8 +73,8 @@ class AnalysisWindow:
 
         # Add the files from the previous steps
         try:
-            self.csv_file.set(self.parent.analysis_window.deformed_files[0])
-            self.csv_file.set(self.parent.analysis_window.deformed_files[1])
+            self.csv_file.set(self.parent.deformation_window.deformed_files[0])
+            self.def_file.set(self.parent.deformation_window.deformed_files[1])
         except:
             # User hasn't run previous step
             pass

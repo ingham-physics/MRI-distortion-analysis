@@ -36,6 +36,7 @@ class CropWindow:
     def __init__(self, parent):
 
         self.parent = parent
+        self.cropped_files = []
 
     def show(self):
 
@@ -146,7 +147,7 @@ class CropWindow:
 
         # Add the files from the previous steps
         try:
-            for f in self.parent.reorientation_window.reoriented_files:
+            for f in self.parent.rigid_window.registered_files:
                 self.insert_file(f)
         except:
             # User hasn't run previous step
@@ -338,6 +339,7 @@ class CropWindow:
                     raise
 
         # Crop each image loaded to physical coords
+        self.cropped_files = []
         for i, img_file in enumerate(self.listbox_paths.get(0, tk.END)):
             logger.info('Cropping: ' + img_file)
 
@@ -371,6 +373,9 @@ class CropWindow:
             writer = sitk.ImageFileWriter()
             writer.SetFileName ( output_file )
             writer.Execute ( cropped_image )
+
+            self.cropped_files.append(output_file)
+
 
         messagebox.showinfo("Done", "Image(s) Cropped", parent=self.top)
 
