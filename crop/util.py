@@ -94,13 +94,10 @@ class ImageAxes(object):
     def update(self):
         if self.axis == 0:
             self.xSlices = self.slice
-            #slice_mm = self.data.TransformIndexToPhysicalPoint((0,0,self.slice))[2]
         if self.axis == 1:
             self.ySlices = self.slice
-            #slice_mm = self.data.TransformIndexToPhysicalPoint((0,self.slice,0))[1]
         if self.axis == 2:
             self.zSlices = self.slice
-            #slice_mm = self.data.TransformIndexToPhysicalPoint((self.slice,0,0))[0]
 
         self.axes.set_title(self.dimName + " (Slice: "+str(self.slice)+")")
 

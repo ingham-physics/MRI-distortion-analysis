@@ -58,18 +58,18 @@ class CropWindow:
 
         plot_frame = ttk.Labelframe(self.top, text='Crop Image')
         plot_frame.grid(row=1, padx=15, pady=15, sticky="ew")
-        self.xFrom = tk.StringVar()
-        self.xFrom.trace("w", lambda name, index, mode, sv=self.xFrom: self.update_selection())
-        self.xTo = tk.StringVar()
-        self.xTo.trace("w", lambda name, index, mode, sv=self.xTo: self.update_selection())
-        self.yFrom = tk.StringVar()
-        self.yFrom.trace("w", lambda name, index, mode, sv=self.yFrom: self.update_selection())
-        self.yTo = tk.StringVar()
-        self.yTo.trace("w", lambda name, index, mode, sv=self.yTo: self.update_selection())
-        self.zFrom = tk.StringVar()
-        self.zFrom.trace("w", lambda name, index, mode, sv=self.zFrom: self.update_selection())
-        self.zTo = tk.StringVar()
-        self.zTo.trace("w", lambda name, index, mode, sv=self.zTo: self.update_selection())
+        self.strVarXfrom = tk.StringVar()
+        #self.strVarXfrom.trace("w", lambda name, index, mode, sv=self.strVarXfrom: self.update_selection())
+        self.strVarXto = tk.StringVar()
+        #self.strVarXto.trace("w", lambda name, index, mode, sv=self.strVarXto: self.update_selection())
+        self.strVarYfrom = tk.StringVar()
+        #self.strVarYfrom.trace("w", lambda name, index, mode, sv=self.strVarYfrom: self.update_selection())
+        self.strVarYto = tk.StringVar()
+        #self.strVarYto.trace("w", lambda name, index, mode, sv=self.strVarYto: self.update_selection())
+        self.strVarZfrom = tk.StringVar()
+        #self.strVarZfrom.trace("w", lambda name, index, mode, sv=self.strVarZfrom: self.update_selection())
+        self.strVarZto = tk.StringVar()
+        #self.strVarZto.trace("w", lambda name, index, mode, sv=self.strVarZto: self.update_selection())
         param_frame = ttk.Labelframe(self.top, text='Cropping Parameters (Voxels)')
         param_frame.grid(row=3, padx=15, pady=15, sticky="ew")
         tk.Label(param_frame,text='X', font=("Helvetica", 10)).grid(row=1, column=2, padx=0, pady=0)
@@ -77,12 +77,38 @@ class CropWindow:
         tk.Label(param_frame,text='Z', font=("Helvetica", 10)).grid(row=1, column=4, padx=0, pady=0)
         tk.Label(param_frame,text='From:', font=("Helvetica", 10)).grid(row=2, column=1, padx=0, pady=0)
         tk.Label(param_frame,text='To:', font=("Helvetica", 10)).grid(row=3, column=1, padx=0, pady=0)
-        tk.Entry(param_frame, textvariable=self.xFrom, width=10).grid(row=2, column=2, padx=15, pady=15)
-        tk.Entry(param_frame, textvariable=self.xTo, width=10).grid(row=3, column=2, padx=15, pady=15)
-        tk.Entry(param_frame, textvariable=self.yFrom, width=10).grid(row=2, column=3, padx=15, pady=15)
-        tk.Entry(param_frame, textvariable=self.yTo, width=10).grid(row=3, column=3, padx=15, pady=15)
-        tk.Entry(param_frame, textvariable=self.zFrom, width=10).grid(row=2, column=4, padx=15, pady=15)
-        tk.Entry(param_frame, textvariable=self.zTo, width=10).grid(row=3, column=4, padx=15, pady=15)
+        entXFrom = tk.Entry(param_frame, textvariable=self.strVarXfrom, width=10)
+        entXFrom.grid(row=2, column=2, padx=15, pady=15)
+        entXFrom.bind ("<Return>",  (lambda _: self.entry_changed()))
+        entXFrom.bind ("<FocusOut>",  (lambda _: self.entry_changed()))
+        entXto = tk.Entry(param_frame, textvariable=self.strVarXto, width=10)
+        entXto.grid(row=3, column=2, padx=15, pady=15)
+        entXto.bind ("<Return>",  (lambda _: self.entry_changed()))
+        entXto.bind ("<FocusOut>",  (lambda _: self.entry_changed()))
+        entYFrom = tk.Entry(param_frame, textvariable=self.strVarYfrom, width=10)
+        entYFrom.grid(row=2, column=3, padx=15, pady=15)
+        entYFrom.bind ("<Return>",  (lambda _: self.entry_changed()))
+        entYFrom.bind ("<FocusOut>",  (lambda _: self.entry_changed()))
+        entYTo = tk.Entry(param_frame, textvariable=self.strVarYto, width=10)
+        entYTo.grid(row=3, column=3, padx=15, pady=15)
+        entYTo.bind ("<Return>",  (lambda _: self.entry_changed()))
+        entYTo.bind ("<FocusOut>",  (lambda _: self.entry_changed()))
+        entZFrom = tk.Entry(param_frame, textvariable=self.strVarZfrom, width=10)
+        entZFrom.grid(row=2, column=4, padx=15, pady=15)
+        entZFrom.bind ("<Return>",  (lambda _: self.entry_changed()))
+        entZFrom.bind ("<FocusOut>",  (lambda _: self.entry_changed()))
+        entZTo = tk.Entry(param_frame, textvariable=self.strVarZto, width=10)
+        entZTo.grid(row=3, column=4, padx=15, pady=15)
+        entZTo.bind ("<Return>",  (lambda _: self.entry_changed()))
+        entZTo.bind ("<FocusOut>",  (lambda _: self.entry_changed()))
+
+        # Radio buttons for Units (voxels or mm)
+        self.units = tk.IntVar()
+        tk.Radiobutton(param_frame, text="mm", variable=self.units, value=1,
+                command = lambda : self.update_units()).grid(row=2, column=5, padx=15, pady=15)
+        tk.Radiobutton(param_frame, text="voxels", variable=self.units, value=2,
+                command = lambda : self.update_units()).grid(row=3, column=5, padx=15, pady=15)
+        self.units.set(1)
 
         tk.Button(self.top,text='Crop', command=self.crop, width=30, height=2).grid(row=4, padx=5, pady=5)
 
@@ -121,57 +147,96 @@ class CropWindow:
             # User hasn't run previous step
             pass
 
+    def update_units(self):
+        if self.units.get() == 1: # mm
+            self.strVarXfrom.set(str(self.physFrom[0]))
+            self.strVarXto.set(str(self.physTo[0]))
+            self.strVarYfrom.set(str(self.physFrom[1]))
+            self.strVarYto.set(str(self.physTo[1]))
+            self.strVarZfrom.set(str(self.physFrom[2]))
+            self.strVarZto.set(str(self.physTo[2]))
+        else: # voxels
+            indFrom = self.img.TransformPhysicalPointToIndex(self.physFrom)
+            indTo = self.img.TransformPhysicalPointToIndex(self.physTo)
+            self.strVarXfrom.set(str(indFrom[0]))
+            self.strVarXto.set(str(indTo[0]))
+            self.strVarYfrom.set(str(indFrom[1]))
+            self.strVarYto.set(str(indTo[1]))
+            self.strVarZfrom.set(str(indFrom[2]))
+            self.strVarZto.set(str(indTo[2]))
+
+    def entry_changed(self):
+        # Read values from entry fields and update the phys coords
+        if self.units.get() == 1: # mm
+            self.physFrom = (float(self.strVarXfrom.get()), float(self.strVarYfrom.get()), float(self.strVarZfrom.get()) )
+            self.physTo = (float(self.strVarXto.get()), float(self.strVarYto.get()), float(self.strVarZto.get()) )
+        else: # voxels
+            indFrom = (int(self.strVarXfrom.get()), int(self.strVarYfrom.get()), int(self.strVarZfrom.get()) )
+            indTo = (int(self.strVarXto.get()), int(self.strVarYto.get()), int(self.strVarZto.get()) )
+
+            self.physFrom = self.img.TransformIndexToPhysicalPoint(indFrom)
+            self.physTo = self.img.TransformIndexToPhysicalPoint(indTo)
+
+        self.update_selection()
+
     def rect_selected(self, rect, axis):
 
+        indFrom = self.img.TransformPhysicalPointToIndex(self.physFrom)
+        indTo = self.img.TransformPhysicalPointToIndex(self.physTo)
+
         if axis == 0: # Axial
-            self.xFrom.set(int(rect[0][0]))
-            self.xTo.set(int(rect[1][0]))
-            self.yFrom.set(int(rect[0][1]))
-            self.yTo.set(int(rect[1][1]))
+            indFrom = (int(rect[0][0]), int(rect[0][1]), indFrom[2]) 
+            indTo = (int(rect[1][0]), int(rect[1][1]), indTo[2])
         if axis == 1: # Coronal
-            self.xFrom.set(int(rect[0][0]))
-            self.xTo.set(int(rect[1][0]))
-            self.zFrom.set(int(rect[0][1]))
-            self.zTo.set(int(rect[1][1]))
+            indFrom = (int(rect[0][0]), indFrom[1], int(rect[0][1])) 
+            indTo = (int(rect[1][0]), indTo[1], int(rect[1][1]))
         if axis == 2: # Sagittal
-            self.yFrom.set(int(rect[0][0]))
-            self.yTo.set(int(rect[1][0]))
-            self.zFrom.set(int(rect[0][1]))
-            self.zTo.set(int(rect[1][1]))
+            indFrom = (indFrom[0], int(rect[0][0]), int(rect[0][1])) 
+            indTo = (indTo[0], int(rect[1][0]), int(rect[1][1]))
+
+        self.physFrom = self.img.TransformIndexToPhysicalPoint(indFrom)
+        self.physTo = self.img.TransformIndexToPhysicalPoint(indTo)
+        self.update_units()
 
         self.update_selection()
 
     def update_selection(self):
-    
+
+        # Determine the voxel coords to updates the axes
         try:
+            indFrom = self.img.TransformPhysicalPointToIndex(self.physFrom)
+            indTo = self.img.TransformPhysicalPointToIndex(self.physTo)
+
             self.imAx.set_selected_region(
-                int(self.xFrom.get()),
-                int(self.yFrom.get()),
-                int(self.zFrom.get()),
-                int(self.xTo.get()), 
-                int(self.yTo.get()), 
-                int(self.zTo.get()))
+                indFrom[0],
+                indFrom[1],
+                indFrom[2],
+                indTo[0],
+                indTo[1], 
+                indTo[2])
 
             self.imCor.set_selected_region(
-                int(self.xFrom.get()),
-                int(self.zFrom.get()),
-                int(self.yFrom.get()),
-                int(self.xTo.get()), 
-                int(self.zTo.get()), 
-                int(self.yTo.get()))
+                indFrom[0],
+                indFrom[2],
+                indFrom[1],
+                indTo[0],
+                indTo[2],
+                indTo[1])
 
             self.imSag.set_selected_region(
-                int(self.yFrom.get()), 
-                int(self.zFrom.get()), 
-                int(self.xFrom.get()), 
-                int(self.yTo.get()), 
-                int(self.zTo.get()), 
-                int(self.xTo.get()))
-        except AttributeError:
+                indFrom[1],
+                indFrom[2],
+                indFrom[0],
+                indTo[1],
+                indTo[2],
+                indTo[0])
+        except AttributeError as e:
             # Occurs when no image has been loaded yet
             # We can safely ignore
+            print(e)
             pass
-        except ValueError:
+        except ValueError as e:
+            print(e)
             # Occurs when an invalid character is entered
             pass
 
@@ -185,6 +250,10 @@ class CropWindow:
             print('File read failed ' + self.source_file.get() )
             messagebox.showerror("Error", "An error occurred while reading the input file", parent=self.top)
             return
+
+        self.axAx.clear()
+        self.axCor.clear()
+        self.axSag.clear()
         
         self.imAx = ImageAxes(0, self.axAx, self.img, self.rect_selected)
         self.imCor = ImageAxes(1, self.axCor, self.img, self.rect_selected)
@@ -194,14 +263,11 @@ class CropWindow:
         self.canvas.mpl_connect('scroll_event', self.imCor.onscroll)
         self.canvas.mpl_connect('scroll_event', self.imSag.onscroll)
 
-        self.xFrom.set('0')
-        self.xTo.set(str(self.img.GetWidth()))
+        self.physFrom = self.img.TransformIndexToPhysicalPoint((0,0,0))
+        print(self.img.GetSize())
+        self.physTo = self.img.TransformIndexToPhysicalPoint(self.img.GetSize())
 
-        self.yFrom.set('0')
-        self.yTo.set(str(self.img.GetHeight()))
-
-        self.zFrom.set('0')
-        self.zTo.set(str(self.img.GetDepth()))
+        self.update_units()
 
     def choose_source_file(self):
         file = filedialog.askopenfilename(parent=self.top, initialdir=self.source_file.get())
@@ -240,15 +306,15 @@ class CropWindow:
         # Crop the image
         crop = sitk.CropImageFilter()
 
-        lowerBoundary = [int(self.xFrom.get()),
-            int(self.yFrom.get()),
-            int(self.zFrom.get())]
+        lowerBoundary = [int(self.strVarXfrom.get()),
+            int(self.strVarYfrom.get()),
+            int(self.strVarZfrom.get())]
         crop.SetLowerBoundaryCropSize(lowerBoundary)
 
         size = self.img.GetSize()
-        upperBoundary = [size[0]-int(self.xTo.get()),
-            size[1]-int(self.yTo.get()),
-            size[2]-int(self.zTo.get())]
+        upperBoundary = [size[0]-int(self.strVarXto.get()),
+            size[1]-int(self.strVarYto.get()),
+            size[2]-int(self.strVarZto.get())]
         crop.SetUpperBoundaryCropSize(upperBoundary)
 
         cropped_image = crop.Execute ( self.img )
