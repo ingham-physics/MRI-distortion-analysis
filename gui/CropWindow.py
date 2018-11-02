@@ -310,7 +310,16 @@ class CropWindow:
 
     def add_file(self):
 
-        f = os.path.normpath(filedialog.askopenfilename(parent=self.top))
+        initial_dir = self.parent.workspace
+        
+        if self.listbox_paths.size() > 0:
+            initial_dir = os.path.dirname(self.listbox_paths.get(tk.END))
+            
+        f = filedialog.askopenfilename(parent=self.top, initialdir=initial_dir)
+        if len(f) == 0:
+            # Cancelled
+            return
+        f = os.path.normpath(f)
 
         self.insert_file(f)
        

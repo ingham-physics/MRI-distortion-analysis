@@ -83,14 +83,20 @@ class AnalysisWindow:
         self.top.rowconfigure(5, weight=1)
 
     def choose_csv_file(self):
-        file = filedialog.askopenfilename(parent=self.top, initialdir=self.csv_file.get())
+        initial_dir = os.path.dirname(self.csv_file.get())
+        if len(initial_dir) == 0:
+            initial_dir = self.parent.workspace
+        file = filedialog.askopenfilename(parent=self.top, initialdir=initial_dir)
         if not type(file)==str or len(file) == 0:
             # Dialog cancelled
             return
         self.csv_file.set(os.path.normpath(file))
 
     def choose_def_file(self):
-        file = filedialog.askopenfilename(parent=self.top, initialdir=self.def_file.get())
+        initial_dir = os.path.dirname(self.def_file.get())
+        if len(initial_dir) == 0:
+            initial_dir = self.parent.workspace
+        file = filedialog.askopenfilename(parent=self.top, initialdir=initial_dir)
         if not type(file)==str or len(file) == 0:
             # Dialog cancelled
             return
@@ -131,5 +137,3 @@ class AnalysisWindow:
         perform_analysis(self.csv_file.get(), output_dir, iso, def_file=self.def_file.get())
 
         messagebox.showinfo("Done", "Analysis Completed", parent=self.top)
-
-        self.top.destroy()

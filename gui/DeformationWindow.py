@@ -87,14 +87,20 @@ class DeformationWindow:
         self.top.rowconfigure(5, weight=1)
 
     def choose_source_file(self):
-        file = filedialog.askopenfilename(parent=self.top, initialdir=self.source_file.get())
+        initial_dir = os.path.dirname(self.source_file.get())
+        if len(initial_dir) == 0:
+            initial_dir = self.parent.workspace
+        file = filedialog.askopenfilename(parent=self.top, initialdir=initial_dir)
         if not type(file)==str or len(file) == 0:
             # Dialog cancelled
             return
         self.source_file.set(os.path.normpath(file))
 
     def choose_target_file(self):
-        file = filedialog.askopenfilename(parent=self.top, initialdir=self.target_file.get())
+        initial_dir = os.path.dirname(self.target_file.get())
+        if len(initial_dir) == 0:
+            initial_dir = self.parent.workspace
+        file = filedialog.askopenfilename(parent=self.top, initialdir=initial_dir)
         if not type(file)==str or len(file) == 0:
             # Dialog cancelled
             return

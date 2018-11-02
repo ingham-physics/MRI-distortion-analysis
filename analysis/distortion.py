@@ -61,7 +61,8 @@ def perform_analysis(def_csv_file, output_dir, iso=[0,0,0], px_spacing=[1,1,1], 
     f.close()
 
     # Scatter plot
-    plt.scatter(dists_from_iso, mags)
+    plt.ion() # enables interactive mode
+    plt.scatter(dists_from_iso, mags, s=1)
     plt.xlabel("Distance from ISO (mm)")
     plt.ylabel("Total Distortion (mm)")
     plt.show()
@@ -75,4 +76,4 @@ if __name__ == "__main__":
 
     def_field="./CT-maskedDefField.csv"
 
-    analysis(def_field, "analysis.txt", [119, 100, 35], px_spacing = [1.195312,1.195312,3])
+    perform_analysis(def_field, "analysis.txt", [119, 100, 35], px_spacing = [1.195312,1.195312,3])
