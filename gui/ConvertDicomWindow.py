@@ -39,19 +39,21 @@ class ConvertDicomWindow:
 
         filesFrame = ttk.Labelframe(self.top, text='Dicom Paths')
         filesFrame.grid(row=0, padx=5, pady=5, sticky="news")
-        filesFrame.rowconfigure(1, weight=1)
+        filesFrame.rowconfigure(2, weight=1)
 
         self.listbox_paths = tk.Listbox(filesFrame)
-        self.listbox_paths.grid(row=1, columnspan=1, padx=(5,0), pady=5, sticky='news')
+        self.listbox_paths.grid(row=2, columnspan=1, padx=(5,0), pady=5, sticky='news')
 
         vsb = ttk.Scrollbar(filesFrame, orient="vertical", command=self.listbox_paths.yview)
-        vsb.grid(row=1, column=2, sticky=("N", "S", "E", "W"), padx=(0,10), pady=(5, 5))
+        vsb.grid(row=2, column=2, sticky=("N", "S", "E", "W"), padx=(0,10), pady=(5, 5))
         self.listbox_paths.configure(yscrollcommand=vsb.set)
 
         filesFrame.columnconfigure(0, weight=1)
 
-        tk.Button(filesFrame,text='Add Dicom Series', command=self.add_file, width=20).grid(row=0, padx=5, pady=5)
-        tk.Button(filesFrame,text='Remove Selected', command=self.remove_file, width=20).grid(row=2, padx=5, pady=5)
+        tk.Label(filesFrame, text="Description label", font=("Helvetica", 10)).grid(row=0, padx=10, pady=10)
+
+        tk.Button(filesFrame,text='Add Dicom Series', command=self.add_file, width=20).grid(row=1, padx=5, pady=5)
+        tk.Button(filesFrame,text='Remove Selected', command=self.remove_file, width=20).grid(row=3, padx=5, pady=5)
         tk.Button(self.top,text='Convert', command=self.convert, width=30, height=2).grid(row=2, padx=5, pady=5)
 
         self.top.columnconfigure(0, weight=1)
