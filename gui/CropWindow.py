@@ -62,7 +62,7 @@ class CropWindow:
         filesFrame.columnconfigure(0, weight=1)
 
         # Message for files
-        tk.Message(filesFrame, text="Description goes here", font=("Helvetica", 10), width=500, justify=tk.CENTER).grid(row=0, column=0, padx=1, pady=2, sticky='ew')
+        tk.Message(filesFrame, text="Select the file(s) to be cropped. NOTE: if multiple files are selected, they will be cropped by the same amount", font=("Helvetica", 10), width=500, justify=tk.CENTER).grid(row=0, column=0, padx=1, pady=2, sticky='ew')
 
         # Add file button
         tk.Button(filesFrame,text='Add File', command=self.add_file, width=20).grid(row=1, padx=5, pady=5)
@@ -98,14 +98,14 @@ class CropWindow:
         plot_frame.rowconfigure(1, weight=1)
 
         # Message for crop plot
-        tk.Message(plot_frame, text="Description goes here", font=("Helvetica", 10), width=500, justify=tk.CENTER).grid(row=0, column=0, padx=1, pady=2, sticky='ew')
+        tk.Message(plot_frame, text="Use the green box to select the region to be included in the crop. Anything outside this will be removed. If cropping multiple images, toggle between the 2 files in the previous window", font=("Helvetica", 10), width=500, justify=tk.CENTER).grid(row=0, column=0, padx=1, pady=2, sticky='ew')
 
         # Crop params frame
         param_frame = ttk.Labelframe(self.top, text='Cropping Parameters', style = "Main.TLabelframe")
         param_frame.grid(row=3, padx=15, pady=15, sticky="ew")
 
         # Message for params
-        tk.Message(param_frame, text="Description goes here", font=("Helvetica", 10), width=500, justify=tk.CENTER).grid(row=0, column=1, columnspan=5, padx=1, pady=2, sticky='ew')
+        tk.Message(param_frame, text="The resulting images will be cropped to the following size. This can be adjusted manually if required", font=("Helvetica", 10), width=500, justify=tk.CENTER).grid(row=0, column=1, columnspan=5, padx=1, pady=2, sticky='ew')
 
         tk.Label(param_frame,text='X', font=("Helvetica", 10)).grid(row=1, column=2, padx=0, pady=0)
         tk.Label(param_frame,text='Y', font=("Helvetica", 10)).grid(row=1, column=3, padx=0, pady=0)

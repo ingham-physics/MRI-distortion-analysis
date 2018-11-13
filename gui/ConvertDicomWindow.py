@@ -46,7 +46,7 @@ class ConvertDicomWindow:
         filesFrame.columnconfigure(0, weight=1)
 
         # Description Message
-        tk.Message(filesFrame, text="Description goes here", font=("Helvetica", 10), width=500, justify=tk.CENTER).grid(row=0, column=0, padx=1, pady=2, sticky='ew')
+        tk.Message(filesFrame, text="Select folder(s) containing DICOM datasets to convert to nifti file(s)", font=("Helvetica", 10), width=500, justify=tk.CENTER).grid(row=0, column=0, padx=1, pady=2, sticky='ew')
         
         # Add series button
         tk.Button(filesFrame,text='Add Dicom Series', command=self.add_file, width=20).grid(row=1, padx=5, pady=5)

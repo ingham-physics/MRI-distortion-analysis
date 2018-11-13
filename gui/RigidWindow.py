@@ -55,7 +55,7 @@ class RigidWindow:
         source_frame.columnconfigure(0, weight=1)
 
         # Message for source
-        tk.Message(source_frame, text="Description goes here", font=("Helvetica", 10), width=500, justify=tk.CENTER).grid(row=0, column=0, padx=1, pady=2, sticky='ew')
+        tk.Message(source_frame, text="Select the moving image to be rigidly registered to the target image", font=("Helvetica", 10), width=500, justify=tk.CENTER).grid(row=0, column=0, padx=1, pady=2, sticky='ew')
 
         # Source file label
         tk.Label(source_frame,textvariable=self.source_file, font=("Helvetica", 10, 'bold')).grid(row=1, padx=15, pady=15, sticky="ew")
@@ -76,7 +76,7 @@ class RigidWindow:
         target_frame.columnconfigure(0, weight=1)
 
         # Message for target
-        tk.Message(target_frame, text="Description goes here", font=("Helvetica", 10), width=500, justify=tk.CENTER).grid(row=0, column=0, padx=1, pady=2, sticky='ew')
+        tk.Message(target_frame, text="Select the fixed target image for the rigid registration", font=("Helvetica", 10), width=500, justify=tk.CENTER).grid(row=0, column=0, padx=1, pady=2, sticky='ew')
 
         # Target file label
         tk.Label(target_frame,textvariable=self.target_file, font=("Helvetica", 10, 'bold')).grid(row=1, padx=15, pady=15)

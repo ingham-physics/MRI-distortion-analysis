@@ -45,7 +45,7 @@ def reorient(input_file, output_path):
     logger.info('Reorientation complete')
 
     # Return the reoriented file
-    return file_linac_x3
+    return file_linac
 
     
 # Runs when this script is executed directly from the commmand line

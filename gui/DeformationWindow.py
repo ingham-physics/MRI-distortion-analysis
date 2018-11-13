@@ -59,7 +59,7 @@ class DeformationWindow:
         source_frame.columnconfigure(0, weight=1)
 
         # Message for source
-        tk.Message(source_frame, text="Description goes here", font=("Helvetica", 10), width=500, justify=tk.CENTER).grid(row=0, column=0, padx=1, pady=2, sticky='ew')
+        tk.Message(source_frame, text="Select the moving image to be deformed to the target image", font=("Helvetica", 10), width=500, justify=tk.CENTER).grid(row=0, column=0, padx=1, pady=2, sticky='ew')
 
         # Source file label
         tk.Label(source_frame,textvariable=self.source_file, font=("Helvetica", 10, 'bold')).grid(row=2, padx=15, pady=15)
@@ -80,7 +80,7 @@ class DeformationWindow:
         target_frame.columnconfigure(0, weight=1)
 
         # Message for target
-        tk.Message(target_frame, text="Description goes here", font=("Helvetica", 10), width=500, justify=tk.CENTER).grid(row=0, column=0, padx=1, pady=2, sticky='ew')
+        tk.Message(target_frame, text="Select the fixed target image for the deformable registration", font=("Helvetica", 10), width=500, justify=tk.CENTER).grid(row=0, column=0, padx=1, pady=2, sticky='ew')
 
         # Target file label
         tk.Label(target_frame,textvariable=self.target_file, font=("Helvetica", 10,'bold')).grid(row=1, padx=15, pady=15)
@@ -101,7 +101,7 @@ class DeformationWindow:
         grid_spacing_frame.columnconfigure(0, weight=1)
 
         # Message for grid spacing
-        tk.Message(grid_spacing_frame, text="Description goes here", font=("Helvetica", 10), width=500, justify=tk.CENTER).grid(row=0, column=0, padx=1, pady=2, sticky='ew')
+        tk.Message(grid_spacing_frame, text="Final control point grid spacing for the registration. MRI-sim QA use 25mm; MRI-volunteer/patients use 10mm", font=("Helvetica", 10), width=500, justify=tk.CENTER).grid(row=0, column=0, padx=1, pady=2, sticky='ew')
 
         # Grid spacing label
         tk.Label(grid_spacing_frame,textvariable=self.grid_spacing, font=("Helvetica", 10, 'bold')).grid(row=1, padx=15, pady=15)
@@ -115,7 +115,7 @@ class DeformationWindow:
         threshold_frame.columnconfigure(0, weight=1)
 
         # Message for threshold
-        tk.Message(threshold_frame, text="Description goes here", font=("Helvetica", 10), width=500, justify=tk.CENTER).grid(row=0, column=0, padx=1, pady=2, sticky='ew')
+        tk.Message(threshold_frame, text="Select a threshold intensity to be used to mask the deformation field for the following analysis", font=("Helvetica", 10), width=500, justify=tk.CENTER).grid(row=0, column=0, padx=1, pady=2, sticky='ew')
 
         # Change threshold label
         tk.Label(threshold_frame,textvariable=self.threshold, font=("Helvetica", 10, 'bold')).grid(row=1, padx=15, pady=15)

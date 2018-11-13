@@ -48,7 +48,7 @@ class ReorientationWindow:
         filesFrame.columnconfigure(0, weight=1)
 
         # Description Message
-        tk.Message(filesFrame, text="Description goes here", font=("Helvetica", 10), width=500, justify=tk.CENTER).grid(row=0, column=0, padx=1, pady=2, sticky='ew')
+        tk.Message(filesFrame, text="Select file(s) to undergo reorientation to conventional axial viewing (MR-Linac images only)", font=("Helvetica", 10), width=500, justify=tk.CENTER).grid(row=0, column=0, padx=1, pady=2, sticky='ew')
         
         # Add file button
         tk.Button(filesFrame,text='Add File', command=self.add_file, width=20).grid(row=1, padx=5, pady=5)
