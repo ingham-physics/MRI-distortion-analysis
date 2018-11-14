@@ -32,7 +32,7 @@ class AnalysisWindow:
 
         self.top = tk.Toplevel(self.parent)
         self.top.title('Analysis')
-        self.top.geometry('600x600')
+        self.top.geometry('600x700')
         self.top.update()
         self.top.minsize(self.top.winfo_width(), self.top.winfo_height())
         self.top.resizable(True, True)
@@ -41,33 +41,55 @@ class AnalysisWindow:
 
         self.top.attributes("-topmost", True)
 
+        # StringVars
         self.csv_file = tk.StringVar()
-        csv_frame = ttk.Labelframe(self.top, text='Registration CSV File')
+        self.def_file = tk.StringVar()
+
+        # Define style for labelframe
+        s = ttk.Style()
+        s.configure('Main.TLabelframe.Label', font=('helvetica', 12, 'bold'))
+
+        # CSV Label frame
+        csv_frame = ttk.Labelframe(self.top, text='Registration CSV File', style = "Main.TLabelframe")
         csv_frame.grid(row=0, padx=15, pady=15, sticky="ew")
-        tk.Label(csv_frame,textvariable=self.csv_file, font=("Helvetica", 10)).grid(row=1, padx=15, pady=15)
+        csv_frame.columnconfigure(0, weight=1)
+
+        # Message for csv
+        tk.Message(csv_frame, text="Description goes here", font=("Helvetica", 10), width=500, justify=tk.CENTER).grid(row=0, column=0, padx=1, pady=2, sticky='ew')
+
+        tk.Label(csv_frame,textvariable=self.csv_file, font=("Helvetica", 10, 'bold')).grid(row=1, padx=15, pady=15)
         tk.Button(csv_frame,text='Choose Registration CSV File', command=self.choose_csv_file).grid(row=2, padx=5, pady=5)
 
-        self.def_file = tk.StringVar()
-        def_frame = ttk.Labelframe(self.top, text='Masked Deformation Field File')
+        def_frame = ttk.Labelframe(self.top, text='Masked Deformation Field File', style = "Main.TLabelframe")
         def_frame.grid(row=1, padx=15, pady=15, sticky="ew")
-        tk.Label(def_frame,textvariable=self.def_file, font=("Helvetica", 10)).grid(row=1, padx=15, pady=15)
+        def_frame.columnconfigure(0, weight=1)
+
+        # Message for def
+        tk.Message(def_frame, text="Description goes here", font=("Helvetica", 10), width=500, justify=tk.CENTER).grid(row=0, column=0, padx=1, pady=2, sticky='ew')
+
+        tk.Label(def_frame,textvariable=self.def_file, font=("Helvetica", 10, 'bold')).grid(row=1, padx=15, pady=15)
         tk.Button(def_frame,text='Choose Masked Deformation Field', command=self.choose_def_file).grid(row=2, padx=5, pady=5)
 
-        iso_frame = ttk.Labelframe(self.top, text='ISO Centre')
+        iso_frame = ttk.Labelframe(self.top, text='ISO Centre', style = "Main.TLabelframe")
         iso_frame.grid(row=2, padx=15, pady=15, ipadx=15, ipady=15, sticky="ew")
-        tk.Label(iso_frame, text='x:').grid(row=0, column=0)
-        tk.Label(iso_frame, text='y:').grid(row=0, column=2)
-        tk.Label(iso_frame, text='z:').grid(row=0, column=4)
-        self.iso_x = tk.Entry(iso_frame)
+        iso_frame.columnconfigure(2, weight=1)
+
+        # Message for iso
+        tk.Message(iso_frame, text="Description goes here", font=("Helvetica", 10), width=500, justify=tk.CENTER).grid(row=0, columnspan=3, padx=1, pady=2, sticky='ew')
+
+        tk.Label(iso_frame, text='x:', justify=tk.RIGHT).grid(row=1, column=0, padx=10, pady=10)
+        tk.Label(iso_frame, text='y:', justify=tk.RIGHT).grid(row=2, column=0, padx=10, pady=10)
+        tk.Label(iso_frame, text='z:', justify=tk.RIGHT).grid(row=3, column=0, padx=10, pady=10)
+        self.iso_x = tk.Entry(iso_frame, width=10)
         self.iso_x.insert(tk.END, '0')
-        self.iso_y = tk.Entry(iso_frame)
+        self.iso_y = tk.Entry(iso_frame, width=10)
         self.iso_y.insert(tk.END, '0')
-        self.iso_z = tk.Entry(iso_frame)
+        self.iso_z = tk.Entry(iso_frame, width=10)
         self.iso_z.insert(tk.END, '0')
 
-        self.iso_x.grid(row=0, column=1)
-        self.iso_y.grid(row=0, column=3)
-        self.iso_z.grid(row=0, column=5)
+        self.iso_x.grid(row=1, column=1)
+        self.iso_y.grid(row=2, column=1)
+        self.iso_z.grid(row=3, column=1)
 
         tk.Button(self.top,text='Analyse', command=self.analyse, width=30, height=2).grid(row=4, padx=5, pady=5)
 

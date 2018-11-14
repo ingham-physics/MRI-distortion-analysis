@@ -37,23 +37,33 @@ class ConvertDicomWindow:
 
         self.top.attributes("-topmost", True)
 
-        filesFrame = ttk.Labelframe(self.top, text='Dicom Paths')
+        # Labelframe with style for font
+        s = ttk.Style()
+        s.configure('Main.TLabelframe.Label', font=('helvetica', 12, 'bold'))
+        filesFrame = ttk.Labelframe(self.top, text='Dicom Paths', style = "Main.TLabelframe")
         filesFrame.grid(row=0, padx=5, pady=5, sticky="news")
         filesFrame.rowconfigure(2, weight=1)
+        filesFrame.columnconfigure(0, weight=1)
 
+        # Description Message
+        tk.Message(filesFrame, text="Description goes here", font=("Helvetica", 10), width=500, justify=tk.CENTER).grid(row=0, column=0, padx=1, pady=2, sticky='ew')
+        
+        # Add series button
+        tk.Button(filesFrame,text='Add Dicom Series', command=self.add_file, width=20).grid(row=1, padx=5, pady=5)
+
+        # Main  list box
         self.listbox_paths = tk.Listbox(filesFrame)
         self.listbox_paths.grid(row=2, columnspan=1, padx=(5,0), pady=5, sticky='news')
 
+        # Scrollbar for list box
         vsb = ttk.Scrollbar(filesFrame, orient="vertical", command=self.listbox_paths.yview)
         vsb.grid(row=2, column=2, sticky=("N", "S", "E", "W"), padx=(0,10), pady=(5, 5))
         self.listbox_paths.configure(yscrollcommand=vsb.set)
 
-        filesFrame.columnconfigure(0, weight=1)
-
-        tk.Label(filesFrame, text="Description label", font=("Helvetica", 10)).grid(row=0, padx=10, pady=10)
-
-        tk.Button(filesFrame,text='Add Dicom Series', command=self.add_file, width=20).grid(row=1, padx=5, pady=5)
+        # Remove selected button
         tk.Button(filesFrame,text='Remove Selected', command=self.remove_file, width=20).grid(row=3, padx=5, pady=5)
+
+        # Convert button
         tk.Button(self.top,text='Convert', command=self.convert, width=30, height=2).grid(row=2, padx=5, pady=5)
 
         self.top.columnconfigure(0, weight=1)

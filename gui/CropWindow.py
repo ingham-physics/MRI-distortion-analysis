@@ -51,39 +51,67 @@ class CropWindow:
 
         self.top.attributes("-topmost", True)
 
-        filesFrame = ttk.Labelframe(self.top, text='File Paths')
-        filesFrame.grid(row=0, padx=5, pady=5, sticky="news")
-        filesFrame.rowconfigure(1, weight=1)
+        # Define style for labelframe
+        s = ttk.Style()
+        s.configure('Main.TLabelframe.Label', font=('helvetica', 12, 'bold'))
 
+        # Files labelframe
+        filesFrame = ttk.Labelframe(self.top, text='File Paths', style = "Main.TLabelframe")
+        filesFrame.grid(row=0, padx=5, pady=5, sticky="news")
+        filesFrame.rowconfigure(2, weight=1)
+        filesFrame.columnconfigure(0, weight=1)
+
+        # Message for files
+        tk.Message(filesFrame, text="Description goes here", font=("Helvetica", 10), width=500, justify=tk.CENTER).grid(row=0, column=0, padx=1, pady=2, sticky='ew')
+
+        # Add file button
+        tk.Button(filesFrame,text='Add File', command=self.add_file, width=20).grid(row=1, padx=5, pady=5)
+
+        # Files list box
         self.listbox_paths = tk.Listbox(filesFrame)
-        self.listbox_paths.grid(row=1, columnspan=1, padx=(5,0), pady=5, sticky='news')
+        self.listbox_paths.grid(row=2, columnspan=1, padx=(5,0), pady=5, sticky='news')
         self.listbox_paths.bind("<<ListboxSelect>>", self.select_file)
         self.selection = self.listbox_paths.curselection()
 
+        # Scrollbar for list box
         vsb = ttk.Scrollbar(filesFrame, orient="vertical", command=self.listbox_paths.yview)
-        vsb.grid(row=1, column=2, sticky=("N", "S", "E", "W"), padx=(0,10), pady=(5, 5))
+        vsb.grid(row=2, column=2, sticky=("N", "S", "E", "W"), padx=(0,10), pady=(5, 5))
         self.listbox_paths.configure(yscrollcommand=vsb.set)
 
-        filesFrame.columnconfigure(0, weight=1)
+        # Remove file button
+        tk.Button(filesFrame,text='Remove Selected', command=self.remove_file, width=20).grid(row=3, padx=5, pady=5)
 
-        tk.Button(filesFrame,text='Add File', command=self.add_file, width=20).grid(row=0, padx=5, pady=5)
-        tk.Button(filesFrame,text='Remove Selected', command=self.remove_file, width=20).grid(row=2, padx=5, pady=5)
-
-        plot_frame = ttk.Labelframe(self.top, text='Crop Image')
-        plot_frame.grid(row=1, padx=15, pady=15, sticky="ew")
+        # StringVars for crop params
         self.strVarXfrom = tk.StringVar()
         self.strVarXto = tk.StringVar()
         self.strVarYfrom = tk.StringVar()
         self.strVarYto = tk.StringVar()
         self.strVarZfrom = tk.StringVar()
         self.strVarZto = tk.StringVar()
-        param_frame = ttk.Labelframe(self.top, text='Cropping Parameters')
+
+        # Crop plot frame with canvas
+        plot_frame = ttk.Labelframe(self.top, text='Crop Image', style = "Main.TLabelframe")
+        plot_frame.grid(row=1, padx=15, pady=15, sticky="ew")
+        plot_canvas = tk.Frame(plot_frame)
+        plot_canvas.grid(row=1, column=0)
+        plot_frame.columnconfigure(0, weight=1)
+        plot_frame.rowconfigure(1, weight=1)
+
+        # Message for crop plot
+        tk.Message(plot_frame, text="Description goes here", font=("Helvetica", 10), width=500, justify=tk.CENTER).grid(row=0, column=0, padx=1, pady=2, sticky='ew')
+
+        # Crop params frame
+        param_frame = ttk.Labelframe(self.top, text='Cropping Parameters', style = "Main.TLabelframe")
         param_frame.grid(row=3, padx=15, pady=15, sticky="ew")
+
+        # Message for params
+        tk.Message(param_frame, text="Description goes here", font=("Helvetica", 10), width=500, justify=tk.CENTER).grid(row=0, column=1, columnspan=5, padx=1, pady=2, sticky='ew')
+
         tk.Label(param_frame,text='X', font=("Helvetica", 10)).grid(row=1, column=2, padx=0, pady=0)
         tk.Label(param_frame,text='Y', font=("Helvetica", 10)).grid(row=1, column=3, padx=0, pady=0)
         tk.Label(param_frame,text='Z', font=("Helvetica", 10)).grid(row=1, column=4, padx=0, pady=0)
-        tk.Label(param_frame,text='From:', font=("Helvetica", 10)).grid(row=2, column=1, padx=0, pady=0)
-        tk.Label(param_frame,text='To:', font=("Helvetica", 10)).grid(row=3, column=1, padx=0, pady=0)
+        tk.Label(param_frame,text='From:', font=("Helvetica", 10)).grid(row=2, column=1, padx=15, pady=0)
+        tk.Label(param_frame,text='To:', font=("Helvetica", 10)).grid(row=3, column=1, padx=15, pady=0)
         entXFrom = tk.Entry(param_frame, textvariable=self.strVarXfrom, width=10)
         entXFrom.grid(row=2, column=2, padx=15, pady=15)
         entXFrom.bind ("<Return>",  (lambda _: self.entry_changed()))
@@ -142,7 +170,7 @@ class CropWindow:
 
         fig.subplots_adjust(bottom=0.05, top=0.95, left=0, right=1)   
 
-        self.canvas = FigureCanvasTkAgg(fig, master=plot_frame)
+        self.canvas = FigureCanvasTkAgg(fig, master=plot_canvas)
         self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
 
         # Add the files from the previous steps

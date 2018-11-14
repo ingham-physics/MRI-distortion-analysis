@@ -32,7 +32,7 @@ class DeformationWindow:
 
         self.top = tk.Toplevel(self.parent)
         self.top.title('Deformation')
-        self.top.geometry('600x600')
+        self.top.geometry('600x800')
         self.top.update()
         self.top.minsize(self.top.winfo_width(), self.top.winfo_height())
         self.top.resizable(True, True)
@@ -41,11 +41,31 @@ class DeformationWindow:
 
         self.top.attributes("-topmost", True)
 
+        # StringVars for source and target and params
         self.source_file = tk.StringVar()
-        source_frame = ttk.Labelframe(self.top, text='Source File')
+        self.target_file = tk.StringVar()
+        self.grid_spacing = tk.StringVar()
+        self.grid_spacing.set("25")
+        self.threshold = tk.StringVar()
+        self.threshold.set("100")
+        
+        # Define style for labelframe
+        s = ttk.Style()
+        s.configure('Main.TLabelframe.Label', font=('helvetica', 12, 'bold'))
+
+        # Source labelframe
+        source_frame = ttk.Labelframe(self.top, text='Source File', style = "Main.TLabelframe")
         source_frame.grid(row=0, padx=15, pady=15, sticky="ew")
-        tk.Label(source_frame,textvariable=self.source_file, font=("Helvetica", 10)).grid(row=1, padx=15, pady=15)
-        tk.Button(source_frame,text='Choose Source File', command=self.choose_source_file).grid(row=2, padx=5, pady=5)
+        source_frame.columnconfigure(0, weight=1)
+
+        # Message for source
+        tk.Message(source_frame, text="Description goes here", font=("Helvetica", 10), width=500, justify=tk.CENTER).grid(row=0, column=0, padx=1, pady=2, sticky='ew')
+
+        # Source file label
+        tk.Label(source_frame,textvariable=self.source_file, font=("Helvetica", 10, 'bold')).grid(row=2, padx=15, pady=15)
+
+        # Choose source button
+        tk.Button(source_frame,text='Choose Source File', command=self.choose_source_file).grid(row=3, padx=5, pady=5)
 
         # If there is output from the previous step, load the first file as the source file
         try:
@@ -54,10 +74,18 @@ class DeformationWindow:
             # No first file from previous step
             pass
 
-        self.target_file = tk.StringVar()
-        target_frame = ttk.Labelframe(self.top, text='Target File')
+        # Target labelframe
+        target_frame = ttk.Labelframe(self.top, text='Target File', style = "Main.TLabelframe")
         target_frame.grid(row=1, padx=15, pady=15, sticky="ew")
-        tk.Label(target_frame,textvariable=self.target_file, font=("Helvetica", 10)).grid(row=1, padx=15, pady=15)
+        target_frame.columnconfigure(0, weight=1)
+
+        # Message for target
+        tk.Message(target_frame, text="Description goes here", font=("Helvetica", 10), width=500, justify=tk.CENTER).grid(row=0, column=0, padx=1, pady=2, sticky='ew')
+
+        # Target file label
+        tk.Label(target_frame,textvariable=self.target_file, font=("Helvetica", 10,'bold')).grid(row=1, padx=15, pady=15)
+
+        # Choose target button
         tk.Button(target_frame,text='Choose Target File', command=self.choose_target_file).grid(row=2, padx=5, pady=5)
 
         # If there is output from the previous step, load the second file as the target file
@@ -67,18 +95,32 @@ class DeformationWindow:
             # No second from previous step
             pass
 
-        self.grid_spacing = tk.StringVar()
-        self.grid_spacing.set("25")
-        grid_spacing_frame = ttk.Labelframe(self.top, text='Grid Spacing (mm)')
+        # Grid spacing labelframe
+        grid_spacing_frame = ttk.Labelframe(self.top, text='Grid Spacing (mm)', style = "Main.TLabelframe")
         grid_spacing_frame.grid(row=2, padx=15, pady=15, sticky="ew")
-        tk.Label(grid_spacing_frame,textvariable=self.grid_spacing, font=("Helvetica", 10)).grid(row=1, padx=15, pady=15)
+        grid_spacing_frame.columnconfigure(0, weight=1)
+
+        # Message for grid spacing
+        tk.Message(grid_spacing_frame, text="Description goes here", font=("Helvetica", 10), width=500, justify=tk.CENTER).grid(row=0, column=0, padx=1, pady=2, sticky='ew')
+
+        # Grid spacing label
+        tk.Label(grid_spacing_frame,textvariable=self.grid_spacing, font=("Helvetica", 10, 'bold')).grid(row=1, padx=15, pady=15)
+
+        # Change grid spacing button
         tk.Button(grid_spacing_frame,text='Change Grid Spacing', command=self.change_grid_spacing).grid(row=2, padx=5, pady=5)
 
-        self.threshold = tk.StringVar()
-        self.threshold.set("100")
-        threshold_frame = ttk.Labelframe(self.top, text='Threshold')
+        # Threshold labelframe
+        threshold_frame = ttk.Labelframe(self.top, text='Threshold', style = "Main.TLabelframe")
         threshold_frame.grid(row=3, padx=15, pady=15, sticky="ew")
-        tk.Label(threshold_frame,textvariable=self.threshold, font=("Helvetica", 10)).grid(row=1, padx=15, pady=15)
+        threshold_frame.columnconfigure(0, weight=1)
+
+        # Message for threshold
+        tk.Message(threshold_frame, text="Description goes here", font=("Helvetica", 10), width=500, justify=tk.CENTER).grid(row=0, column=0, padx=1, pady=2, sticky='ew')
+
+        # Change threshold label
+        tk.Label(threshold_frame,textvariable=self.threshold, font=("Helvetica", 10, 'bold')).grid(row=1, padx=15, pady=15)
+
+        # Change threshold button
         tk.Button(threshold_frame,text='Change Threshold', command=self.change_threshold).grid(row=2, padx=5, pady=5)
 
         tk.Button(self.top,text='Deform', command=self.deform, width=30, height=2).grid(row=4, padx=5, pady=5)

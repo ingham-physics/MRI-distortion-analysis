@@ -32,7 +32,7 @@ class RigidWindow:
 
         self.top = tk.Toplevel(self.parent)
         self.top.title('Rigid Registration')
-        self.top.geometry('600x350')
+        self.top.geometry('600x420')
         self.top.update()
         self.top.minsize(self.top.winfo_width(), self.top.winfo_height())
         self.top.resizable(True, True)
@@ -41,10 +41,26 @@ class RigidWindow:
 
         self.top.attributes("-topmost", True)
 
+        # StringVars for source and target
         self.source_file = tk.StringVar()
-        source_frame = ttk.Labelframe(self.top, text='Source File')
+        self.target_file = tk.StringVar()
+
+        # Define style for labelframe
+        s = ttk.Style()
+        s.configure('Main.TLabelframe.Label', font=('helvetica', 12, 'bold'))
+
+        # Source labelframe
+        source_frame = ttk.Labelframe(self.top, text='Source File', style = "Main.TLabelframe")
         source_frame.grid(row=0, padx=15, pady=15, sticky="ew")
-        tk.Label(source_frame,textvariable=self.source_file, font=("Helvetica", 10)).grid(row=1, padx=15, pady=15)
+        source_frame.columnconfigure(0, weight=1)
+
+        # Message for source
+        tk.Message(source_frame, text="Description goes here", font=("Helvetica", 10), width=500, justify=tk.CENTER).grid(row=0, column=0, padx=1, pady=2, sticky='ew')
+
+        # Source file label
+        tk.Label(source_frame,textvariable=self.source_file, font=("Helvetica", 10, 'bold')).grid(row=1, padx=15, pady=15, sticky="ew")
+
+        # Choose source button
         tk.Button(source_frame,text='Choose Source File', command=self.choose_source_file).grid(row=2, padx=5, pady=5)
 
         # If there is output from the previous step, load the first file as the source file
@@ -54,10 +70,18 @@ class RigidWindow:
             # No first file from previous step
             pass
 
-        self.target_file = tk.StringVar()
-        target_frame = ttk.Labelframe(self.top, text='Target File')
+        # Target labelframe
+        target_frame = ttk.Labelframe(self.top, text='Target File', style = "Main.TLabelframe")
         target_frame.grid(row=1, padx=15, pady=15, sticky="ew")
-        tk.Label(target_frame,textvariable=self.target_file, font=("Helvetica", 10)).grid(row=1, padx=15, pady=15)
+        target_frame.columnconfigure(0, weight=1)
+
+        # Message for target
+        tk.Message(target_frame, text="Description goes here", font=("Helvetica", 10), width=500, justify=tk.CENTER).grid(row=0, column=0, padx=1, pady=2, sticky='ew')
+
+        # Target file label
+        tk.Label(target_frame,textvariable=self.target_file, font=("Helvetica", 10, 'bold')).grid(row=1, padx=15, pady=15)
+
+        # Choose target button
         tk.Button(target_frame,text='Choose Target File', command=self.choose_target_file).grid(row=2, padx=5, pady=5)
 
         # If there is output from the previous step, load the second file as the target file
@@ -67,6 +91,7 @@ class RigidWindow:
             # No second from previous step
             pass
 
+        # Register button
         tk.Button(self.top,text='Register', command=self.register, width=30, height=2).grid(row=4, padx=5, pady=5)
 
         self.top.columnconfigure(0, weight=1)
