@@ -22,20 +22,30 @@ class ConvertDicomWindow:
     def __init__(self, parent):
 
         self.parent = parent
+        self.title = 'Convert DICOM Files'
         self.converted_files = []
 
     def show(self):
 
         self.top = tk.Toplevel(self.parent)
         self.top.title('Convert Dicom Files')
-        self.top.geometry('600x340')
+
+        # Define width and height of this window
+        w = 800
+        h = 650
+
+        # Place the window in the centre of the screen
+        ws = self.parent.winfo_screenwidth()
+        hs = self.parent.winfo_screenheight()
+        x = (ws/2) - (w/2)
+        y = (hs/2) - (h/2)
+        self.top.geometry('%dx%d+%d+%d' % (w, h, x, y))
+
         self.top.update()
         self.top.minsize(self.top.winfo_width(), self.top.winfo_height())
         self.top.resizable(True, True)
         self.top.focus_set()
         self.top.grab_set()
-
-        self.top.attributes("-topmost", True)
 
         # Labelframe with style for font
         s = ttk.Style()
@@ -69,9 +79,16 @@ class ConvertDicomWindow:
         self.top.columnconfigure(0, weight=1)
         self.top.rowconfigure(0, weight=1)
 
+        # This is a modal window so wait until it is closed
+        self.top.wait_window()
+
     def add_file(self):
 
-        self.file = os.path.normpath(filedialog.askdirectory(parent=self.top))
+        selected_dir = filedialog.askdirectory(parent=self.top)
+        if len(selected_dir) == 0:
+            # Selection cancelled
+            return
+        self.file = os.path.normpath(selected_dir)
         self.listbox_paths.insert(tk.END, self.file)
 
     def remove_file(self):

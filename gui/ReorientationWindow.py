@@ -24,13 +24,25 @@ class ReorientationWindow:
     def __init__(self, parent):
 
         self.parent = parent
+        self.title = 'Reorientation'
         self.reoriented_files = []
 
     def show(self):
 
         self.top = tk.Toplevel(self.parent)
         self.top.title('Reorientation')
-        self.top.geometry('600x340')
+
+        # Define width and height of this window
+        w = 600
+        h = 340
+
+        # Place the window in the centre of the screen
+        ws = self.parent.winfo_screenwidth()
+        hs = self.parent.winfo_screenheight()
+        x = (ws/2) - (w/2)
+        y = (hs/2) - (h/2)
+        self.top.geometry('%dx%d+%d+%d' % (w, h, x, y))
+
         self.top.update()
         self.top.minsize(self.top.winfo_width(), self.top.winfo_height())
         self.top.resizable(True, True)
@@ -78,6 +90,9 @@ class ReorientationWindow:
 
         self.top.columnconfigure(0, weight=1)
         self.top.rowconfigure(0, weight=1)
+
+        # This is a modal window so wait until it is closed
+        self.top.wait_window()
 
     def add_file(self):
 

@@ -36,13 +36,25 @@ class CropWindow:
     def __init__(self, parent):
 
         self.parent = parent
+        self.title = 'Crop'
         self.cropped_files = []
 
     def show(self):
 
         self.top = tk.Toplevel(self.parent)
         self.top.title('Crop')
-        self.top.geometry('600x1000')
+
+        # Define width and height of this window
+        w = 600
+        h = 1000
+
+        # Place the window in the centre of the screen
+        ws = self.parent.winfo_screenwidth()
+        hs = self.parent.winfo_screenheight()
+        x = (ws/2) - (w/2)
+        y = (hs/2) - (h/2)
+        self.top.geometry('%dx%d+%d+%d' % (w, h, x, y))
+
         self.top.update()
         self.top.minsize(self.top.winfo_width(), self.top.winfo_height())
         self.top.resizable(True, True)
@@ -180,6 +192,9 @@ class CropWindow:
         except:
             # User hasn't run previous step
             pass
+
+        # This is a modal window so wait until it is closed
+        self.top.wait_window()
 
     def select_file(self, a):
         if len(self.listbox_paths.curselection()) > 3:

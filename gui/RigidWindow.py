@@ -26,13 +26,25 @@ class RigidWindow:
     def __init__(self, parent):
 
         self.parent = parent
+        self.title = 'Rigid Registration'
         self.registered_files = []
 
     def show(self):
 
         self.top = tk.Toplevel(self.parent)
         self.top.title('Rigid Registration')
-        self.top.geometry('600x420')
+
+        # Define width and height of this window
+        w = 600
+        h = 420
+
+        # Place the window in the centre of the screen
+        ws = self.parent.winfo_screenwidth()
+        hs = self.parent.winfo_screenheight()
+        x = (ws/2) - (w/2)
+        y = (hs/2) - (h/2)
+        self.top.geometry('%dx%d+%d+%d' % (w, h, x, y))
+
         self.top.update()
         self.top.minsize(self.top.winfo_width(), self.top.winfo_height())
         self.top.resizable(True, True)
@@ -96,6 +108,9 @@ class RigidWindow:
 
         self.top.columnconfigure(0, weight=1)
         self.top.rowconfigure(5, weight=1)
+
+        # This is a modal window so wait until it is closed
+        self.top.wait_window()
 
     def choose_source_file(self):
         initial_dir = os.path.dirname(self.source_file.get())
