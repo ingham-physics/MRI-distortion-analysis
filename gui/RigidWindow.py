@@ -23,11 +23,12 @@ from rigid.rigid import rigid
 
 class RigidWindow:
 
-    def __init__(self, parent):
+    def __init__(self, parent, previous=None):
 
         self.parent = parent
         self.title = 'Rigid Registration'
-        self.registered_files = []
+        self.previous = previous
+        self.output = []
 
     def show(self):
 
@@ -50,8 +51,6 @@ class RigidWindow:
         self.top.resizable(True, True)
         self.top.focus_set()
         self.top.grab_set()
-
-        self.top.attributes("-topmost", True)
 
         # StringVars for source and target
         self.source_file = tk.StringVar()
@@ -76,11 +75,8 @@ class RigidWindow:
         tk.Button(source_frame,text='Choose Source File', command=self.choose_source_file).grid(row=2, padx=5, pady=5)
 
         # If there is output from the previous step, load the first file as the source file
-        try:
-            self.source_file.set(self.parent.reorientation_window.reoriented_files[0])
-        except:
-            # No first file from previous step
-            pass
+        if self.previous:
+            if len(self.previous.output) > 0: self.source_file.set(self.previous.output[0])
 
         # Target labelframe
         target_frame = ttk.Labelframe(self.top, text='Target File', style = "Main.TLabelframe")
@@ -97,11 +93,8 @@ class RigidWindow:
         tk.Button(target_frame,text='Choose Target File', command=self.choose_target_file).grid(row=2, padx=5, pady=5)
 
         # If there is output from the previous step, load the second file as the target file
-        try:
-            self.target_file.set(self.parent.reorientation_window.reoriented_files[1])
-        except:
-            # No second from previous step
-            pass
+        if self.previous:
+            if len(self.previous.output) > 1: self.target_file.set(self.previous.output[1])
 
         # Register button
         tk.Button(self.top,text='Register', command=self.register, width=30, height=2).grid(row=4, padx=5, pady=5)
@@ -135,7 +128,7 @@ class RigidWindow:
     def register(self):
 
         # Create the output directory if it doesn't already exist
-        output_dir = os.path.join(self.parent.workspace,'step4')
+        output_dir = os.path.join(self.parent.workspace,'rigid')
         try:
             # Python 3
             os.makedirs(output_dir, exist_ok=True) # > Python 3.2
@@ -149,9 +142,9 @@ class RigidWindow:
 
         registered, target = rigid(self.source_file.get(),self.target_file.get(), output_dir)
 
-        self.registered_files = []
-        self.registered_files.append(registered) # Registered source file
-        self.registered_files.append(target) # target fle
+        self.output = []
+        self.output.append(registered) # Registered source file
+        self.output.append(target) # target fle
 
         messagebox.showinfo("Done", "Rigid Registration Completed", parent=self.top)
 

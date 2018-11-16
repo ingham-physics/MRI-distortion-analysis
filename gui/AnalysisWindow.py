@@ -23,11 +23,12 @@ from analysis.distortion import perform_analysis
 
 class AnalysisWindow:
 
-    def __init__(self, parent):
+    def __init__(self, parent, previous):
 
         self.parent = parent
         self.title = 'Analysis'
-        #self.deformed_files = []
+        self.previous = previous
+        self.output = []
 
     def show(self):
 
@@ -50,8 +51,6 @@ class AnalysisWindow:
         self.top.resizable(True, True)
         self.top.focus_set()
         self.top.grab_set()
-
-        self.top.attributes("-topmost", True)
 
         # StringVars
         self.csv_file = tk.StringVar()
@@ -106,12 +105,9 @@ class AnalysisWindow:
         tk.Button(self.top,text='Analyse', command=self.analyse, width=30, height=2).grid(row=4, padx=5, pady=5)
 
         # Add the files from the previous steps
-        try:
-            self.csv_file.set(self.parent.deformation_window.deformed_files[0])
-            self.def_file.set(self.parent.deformation_window.deformed_files[1])
-        except:
-            # User hasn't run previous step
-            pass
+        if self.previous:
+            if len(self.previous.output) > 0: self.csv_file.set(self.previous.output[0])
+            if len(self.previous.output) > 1: self.def_file.set(self.previous.output[1])
 
         self.top.columnconfigure(0, weight=1)
         self.top.rowconfigure(5, weight=1)
@@ -159,7 +155,7 @@ class AnalysisWindow:
             return
 
         # Create the output directory if it doesn't already exist
-        output_dir = os.path.join(self.parent.workspace,'step8')
+        output_dir = os.path.join(self.parent.workspace,'analysis')
         try:
             # Python 3
             os.makedirs(output_dir, exist_ok=True) # > Python 3.2
@@ -171,6 +167,8 @@ class AnalysisWindow:
                 if not os.path.isdir(output_dir):
                     raise
 
-        perform_analysis(self.csv_file.get(), output_dir, iso, def_file=self.def_file.get())
+        self.output = []
+        result = perform_analysis(self.csv_file.get(), output_dir, iso, def_file=self.def_file.get())
+        self.output.append(result)
 
         messagebox.showinfo("Done", "Analysis Completed", parent=self.top)

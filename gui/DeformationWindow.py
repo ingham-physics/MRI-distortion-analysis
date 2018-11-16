@@ -23,11 +23,12 @@ from MRL_deformable.mrl_deformable import mrl_deformable
 
 class DeformationWindow:
 
-    def __init__(self, parent):
+    def __init__(self, parent, previous):
 
         self.parent = parent
         self.title = 'Deformable Registration'
-        self.deformed_files = []
+        self.previous = previous
+        self.output = []
 
     def show(self):
 
@@ -50,8 +51,6 @@ class DeformationWindow:
         self.top.resizable(True, True)
         self.top.focus_set()
         self.top.grab_set()
-
-        self.top.attributes("-topmost", True)
 
         # StringVars for source and target and params
         self.source_file = tk.StringVar()
@@ -80,11 +79,8 @@ class DeformationWindow:
         tk.Button(source_frame,text='Choose Source File', command=self.choose_source_file).grid(row=3, padx=5, pady=5)
 
         # If there is output from the previous step, load the first file as the source file
-        try:
-            self.source_file.set(self.parent.crop_window.cropped_files[0])
-        except:
-            # No first file from previous step
-            pass
+        if self.previous:
+            if len(self.previous.output) > 0: self.source_file.set(self.previous.output[0])
 
         # Target labelframe
         target_frame = ttk.Labelframe(self.top, text='Target File', style = "Main.TLabelframe")
@@ -101,11 +97,8 @@ class DeformationWindow:
         tk.Button(target_frame,text='Choose Target File', command=self.choose_target_file).grid(row=2, padx=5, pady=5)
 
         # If there is output from the previous step, load the second file as the target file
-        try:
-            self.target_file.set(self.parent.crop_window.cropped_files[1])
-        except:
-            # No second from previous step
-            pass
+        if self.previous:
+            if len(self.previous.output) > 1: self.target_file.set(self.previous.output[1])
 
         # Grid spacing labelframe
         grid_spacing_frame = ttk.Labelframe(self.top, text='Grid Spacing (mm)', style = "Main.TLabelframe")
@@ -192,7 +185,7 @@ class DeformationWindow:
     def deform(self):
 
         # Create the output directory if it doesn't already exist
-        output_dir = os.path.join(self.parent.workspace,'step6')
+        output_dir = os.path.join(self.parent.workspace,'deform')
         try:
             # Python 3
             os.makedirs(output_dir, exist_ok=True) # > Python 3.2
@@ -204,9 +197,10 @@ class DeformationWindow:
                 if not os.path.isdir(output_dir):
                     raise
 
+        self.output = []
         csv_file, def_file = mrl_deformable(self.source_file.get(),self.target_file.get(), output_dir, int(self.grid_spacing.get()), int(self.threshold.get()))
-        self.deformed_files.append(csv_file)
-        self.deformed_files.append(def_file)
+        self.output.append(csv_file)
+        self.output.append(def_file)
 
         messagebox.showinfo("Done", "Deformation Completed", parent=self.top)
 

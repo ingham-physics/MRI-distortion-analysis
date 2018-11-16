@@ -21,11 +21,12 @@ from ReOrientation.orientation import reorient
 
 class ReorientationWindow:
 
-    def __init__(self, parent):
+    def __init__(self, parent, previous):
 
         self.parent = parent
         self.title = 'Reorientation'
-        self.reoriented_files = []
+        self.previous = previous
+        self.output = []
 
     def show(self):
 
@@ -49,8 +50,6 @@ class ReorientationWindow:
         self.top.focus_set()
         self.top.grab_set()
 
-        self.top.attributes("-topmost", True)
-
         # Labelframe with style for font
         s = ttk.Style()
         s.configure('Main.TLabelframe.Label', font=('helvetica', 12, 'bold'))
@@ -70,12 +69,9 @@ class ReorientationWindow:
         self.listbox_paths.grid(row=2, columnspan=1, padx=(5,0), pady=5, sticky='news')
 
         # Add the files from the previous steps to the listbox
-        try:
-            for f in self.parent.convert_dicom_window.converted_files:
+        if self.previous:
+            for f in self.previous.output:
                 self.listbox_paths.insert(tk.END, f)
-        except:
-            # User hasn't run previous step
-            pass
 
         # Scrollbar for list box
         vsb = ttk.Scrollbar(filesFrame, orient="vertical", command=self.listbox_paths.yview)
@@ -123,7 +119,7 @@ class ReorientationWindow:
         if len(input_files) > 0:
 
             # Create the output directory if it doesn't already exist
-            output_dir = os.path.join(self.parent.workspace,'step2')
+            output_dir = os.path.join(self.parent.workspace,'reorient')
             try:
                 # Python 3
                 os.makedirs(output_dir, exist_ok=True) # > Python 3.2
@@ -135,10 +131,10 @@ class ReorientationWindow:
                     if not os.path.isdir(output_dir):
                         raise
 
-        self.reoriented_files = []
+        self.output = []
         for input_file in input_files:
             output_file = reorient(input_file,output_dir)
-            self.reoriented_files.append(output_file)
+            self.output.append(output_file)
 
         messagebox.showinfo("Done", "Reorientation Completed", parent=self.top)
 

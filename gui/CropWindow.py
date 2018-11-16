@@ -33,11 +33,12 @@ logger = logging.getLogger(__name__)
 
 class CropWindow:
 
-    def __init__(self, parent):
+    def __init__(self, parent, previous):
 
         self.parent = parent
         self.title = 'Crop'
-        self.cropped_files = []
+        self.previous = previous
+        self.output = []
 
     def show(self):
 
@@ -60,8 +61,6 @@ class CropWindow:
         self.top.resizable(True, True)
         self.top.focus_set()
         self.top.grab_set()
-
-        self.top.attributes("-topmost", True)
 
         # Define style for labelframe
         s = ttk.Style()
@@ -185,13 +184,10 @@ class CropWindow:
         self.canvas = FigureCanvasTkAgg(fig, master=plot_canvas)
         self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
 
-        # Add the files from the previous steps
-        try:
-            for f in self.parent.rigid_window.registered_files:
+        # Add the files from the previous steps to the listbox
+        if self.previous:
+            for f in self.previous.output:
                 self.insert_file(f)
-        except:
-            # User hasn't run previous step
-            pass
 
         # This is a modal window so wait until it is closed
         self.top.wait_window()
@@ -378,7 +374,7 @@ class CropWindow:
     def crop(self):
 
         # Create the output directory if it doesn't already exist
-        output_dir = os.path.join(self.parent.workspace,'step5')
+        output_dir = os.path.join(self.parent.workspace,'crop')
         try:
             # Python 3
             os.makedirs(output_dir, exist_ok=True) # > Python 3.2
@@ -391,7 +387,7 @@ class CropWindow:
                     raise
 
         # Crop each image loaded to physical coords
-        self.cropped_files = []
+        self.output = []
         for i, img_file in enumerate(self.listbox_paths.get(0, tk.END)):
             logger.info('Cropping: ' + img_file)
 
@@ -426,7 +422,7 @@ class CropWindow:
             writer.SetFileName ( output_file )
             writer.Execute ( cropped_image )
 
-            self.cropped_files.append(output_file)
+            self.output.append(output_file)
 
 
         messagebox.showinfo("Done", "Image(s) Cropped", parent=self.top)

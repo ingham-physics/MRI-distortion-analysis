@@ -144,12 +144,15 @@ class Application(tk.Frame):
         # Prepare Windows
         self.main_window = MainWindow(self)
 
-        prepared_steps = []
+        window_steps = []
+        previous_step = None
         for step in workflow.steps:
-            prepared_steps.append(step(self))
+            window_step = step(self, previous_step)
+            window_steps.append(window_step)
+            previous_step = window_step
 
         self.parent.withdraw()
-        self.main_window.show(workflow.title, workflow.msg, prepared_steps)
+        self.main_window.show(workflow.title, workflow.msg, window_steps)
         self.parent.deiconify()
 
     def change_workspace(self):

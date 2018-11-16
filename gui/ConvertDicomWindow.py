@@ -19,11 +19,12 @@ logger = logging.getLogger(__name__)
 
 class ConvertDicomWindow:
 
-    def __init__(self, parent):
+    def __init__(self, parent, previous):
 
         self.parent = parent
         self.title = 'Convert DICOM Files'
-        self.converted_files = []
+        self.previous = previous
+        self.output = []
 
     def show(self):
 
@@ -70,6 +71,11 @@ class ConvertDicomWindow:
         vsb.grid(row=2, column=2, sticky=("N", "S", "E", "W"), padx=(0,10), pady=(5, 5))
         self.listbox_paths.configure(yscrollcommand=vsb.set)
 
+        # Add the files from the previous steps to the listbox
+        if self.previous:
+            for f in self.previous.output:
+                self.listbox_paths.insert(tk.END, f)
+                
         # Remove selected button
         tk.Button(filesFrame,text='Remove Selected', command=self.remove_file, width=20).grid(row=3, padx=5, pady=5)
 
@@ -108,7 +114,7 @@ class ConvertDicomWindow:
             return
 
         # Create the output directory if it doesn't already exist
-        output_dir = os.path.join(self.parent.workspace,'step1')
+        output_dir = os.path.join(self.parent.workspace,'convert')
         try:
             # Python 3
             os.makedirs(output_dir, exist_ok=True) # > Python 3.2
@@ -123,6 +129,7 @@ class ConvertDicomWindow:
         files_converted_success = True
 
         ind = 0
+        self.output = []
         for input_dir in dicom_paths:
         
             # Use the directory name as a file name
@@ -131,9 +138,9 @@ class ConvertDicomWindow:
             output_file = os.path.join(os.getcwd(),output_file)
 
             try:
-                result = subprocess.check_output(["itkDicomSeriesReadImageWrite", input_dir, output_file])
+                subprocess.check_output(["itkDicomSeriesReadImageWrite", input_dir, output_file])
                 logger.info("Files converted from " + input_dir + " written to " + output_file)
-                self.converted_files.append(output_file)
+                self.output.append(output_file)
                 self.listbox_paths.delete(int(ind))
                 
             except:
