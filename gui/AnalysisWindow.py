@@ -66,7 +66,7 @@ class AnalysisWindow:
         csv_frame.columnconfigure(0, weight=1)
 
         # Message for csv
-        tk.Message(csv_frame, text="Description goes here", font=("Helvetica", 10), width=500, justify=tk.CENTER).grid(row=0, column=0, padx=1, pady=2, sticky='ew')
+        tk.Message(csv_frame, text="Select the .csv file from the previous step to output analysis data", font=("Helvetica", 10), width=500, justify=tk.CENTER).grid(row=0, column=0, padx=1, pady=2, sticky='ew')
 
         tk.Label(csv_frame,textvariable=self.csv_file, font=("Helvetica", 10, 'bold')).grid(row=1, padx=15, pady=15)
         tk.Button(csv_frame,text='Choose Registration CSV File', command=self.choose_csv_file).grid(row=2, padx=5, pady=5)
@@ -76,7 +76,7 @@ class AnalysisWindow:
         def_frame.columnconfigure(0, weight=1)
 
         # Message for def
-        tk.Message(def_frame, text="Description goes here", font=("Helvetica", 10), width=500, justify=tk.CENTER).grid(row=0, column=0, padx=1, pady=2, sticky='ew')
+        tk.Message(def_frame, text="Select the deformation field result from the previous step for analysis (.DISP.nii.gz file)", font=("Helvetica", 10), width=500, justify=tk.CENTER).grid(row=0, column=0, padx=1, pady=2, sticky='ew')
 
         tk.Label(def_frame,textvariable=self.def_file, font=("Helvetica", 10, 'bold')).grid(row=1, padx=15, pady=15)
         tk.Button(def_frame,text='Choose Masked Deformation Field', command=self.choose_def_file).grid(row=2, padx=5, pady=5)
@@ -86,7 +86,7 @@ class AnalysisWindow:
         iso_frame.columnconfigure(2, weight=1)
 
         # Message for iso
-        tk.Message(iso_frame, text="Description goes here", font=("Helvetica", 10), width=500, justify=tk.CENTER).grid(row=0, columnspan=3, padx=1, pady=2, sticky='ew')
+        tk.Message(iso_frame, text="Input the image isocenter coordinates for plotting of the results", font=("Helvetica", 10), width=500, justify=tk.CENTER).grid(row=0, columnspan=3, padx=1, pady=2, sticky='ew')
 
         tk.Label(iso_frame, text='x:', justify=tk.RIGHT).grid(row=1, column=0, padx=10, pady=10)
         tk.Label(iso_frame, text='y:', justify=tk.RIGHT).grid(row=2, column=0, padx=10, pady=10)

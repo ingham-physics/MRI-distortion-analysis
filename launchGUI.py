@@ -61,7 +61,7 @@ class Workflow():
 
 # Define MRI sim QA workflow
 mr_sim_qa_workflow = Workflow('MRI sim QA',
-    'Description for MR Sim QA workflow goes here',
+    'Distortion analysis for annual QA on the MRI-sim',
     [
         ConvertDicomWindow,
         CropWindow,
@@ -72,7 +72,7 @@ mr_sim_qa_workflow = Workflow('MRI sim QA',
 
 # Define MR volunteer/patient workflow
 mr_volunteer_patient_workflow = Workflow('MR volunteer/patient',
-    'Description for MR volunteer/patient workflow goes here',
+    'Registration of MRI-linac data to MRI-sim data (phantoms/volunteers)',
     [
         ConvertDicomWindow,
         ReorientationWindow,
