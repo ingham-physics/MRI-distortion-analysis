@@ -24,7 +24,7 @@ def rigid(source_file, target_file, output_path):
     #Rigid registration with Aladin: 
     file_rigid_reg = file_base_source + "-Aladin.nii.gz"
     file_rigid_reg_txt = file_base_source + "-Aladin.txt"
-    subprocess.call(["reg_aladin", "-ref", file_target_origin, "-flo", file_source_origin, "-res", file_rigid_reg, "-nac", "-maxit", 10, "-rigOnly", "-aff", file_rigid_reg_txt])
+    subprocess.call(["reg_aladin", "-ref", file_target_origin, "-flo", file_source_origin, "-res", file_rigid_reg, "-nac", "-maxit", "10", "-rigOnly", "-aff", file_rigid_reg_txt])
     
     # Return registered file and target file
     return file_rigid_reg, file_target_origin
