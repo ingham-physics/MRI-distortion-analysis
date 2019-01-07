@@ -120,7 +120,7 @@ class DeformationWindow:
         threshold_frame.columnconfigure(0, weight=1)
 
         # Message for threshold
-        tk.Message(threshold_frame, text="Select a threshold intensity to be used to mask the deformation field for the following analysis", font=("Helvetica", 10), width=500, justify=tk.CENTER).grid(row=0, column=0, padx=1, pady=2, sticky='ew')
+        tk.Message(threshold_frame, text="Select a threshold intensity to be used to mask the deformation field for the following analysis (based on intensities of image being deformed)", font=("Helvetica", 10), width=500, justify=tk.CENTER).grid(row=0, column=0, padx=1, pady=2, sticky='ew')
 
         # Change threshold label
         tk.Label(threshold_frame,textvariable=self.threshold, font=("Helvetica", 10, 'bold')).grid(row=1, padx=15, pady=15)
