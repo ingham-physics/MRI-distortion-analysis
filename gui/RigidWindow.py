@@ -19,6 +19,10 @@ import os
 import logging
 logger = logging.getLogger(__name__)
 
+import SimpleITK as sitk
+import matplotlib.pyplot as plt
+import numpy
+
 from rigid.rigid import rigid
 
 class RigidWindow:
@@ -146,6 +150,53 @@ class RigidWindow:
         self.output.append(registered) # Registered source file
         self.output.append(target) # target fle
 
-        messagebox.showinfo("Done", "Rigid Registration Completed", parent=self.top)
+        # Display the rigid registration to the user
+        s1=sitk.ReadImage(registered)
+        s2=sitk.ReadImage(target)
+
+        class IndexTracker(object):
+            def __init__(self, ax, img1, img2):
+                self.ax = ax
+                ax.set_title('Rigid registration overlay\nRed: {0}\nBlue: {1}\nUse mouse wheel over image to scroll through axial slices'.format('SE_YZ_HF_Linac-Aladin.nii.gz', 'SE_YZ_FH_Linac-ORIGIN.nii.gz'))
+
+                self.img1 = sitk.GetArrayFromImage(img1)
+                self.img2 = sitk.GetArrayFromImage(img2)
+
+                self.slices = self.img1.shape[0]
+                self.ind = self.slices//2
+
+                self.im1 = ax.imshow(self.img1[self.ind, :, :], cmap='Reds', alpha=0.5)
+                self.im2 = ax.imshow(self.img2[self.ind, :, :], cmap='Blues', alpha=0.5)
+                self.update()
+
+            def onscroll(self, event):
+                if event.button == 'up':
+                    self.ind = numpy.clip(self.ind + 1, 0, self.slices - 1)
+                else:
+                    self.ind = numpy.clip(self.ind - 1, 0, self.slices - 1)
+                self.update()
+
+            def update(self):
+                self.im1.set_data(self.img1[self.ind, :, :])
+                self.im2.set_data(self.img2[self.ind, :, :])
+                ax.set_ylabel('slice %s' % self.ind)
+                self.im1.axes.figure.canvas.draw()
+
+
+        fig, ax = plt.subplots(figsize=(10, 10))
+        tracker = IndexTracker(ax, s1, s2)
+
+        fig.canvas.mpl_connect('scroll_event', tracker.onscroll)
+        plt.show(block=False)
+
+        reg_ok = messagebox.askquestion("Done", "Inspect the quality of the rigid registration in the figure opened.\n\nIs the Rigid Registration acceptable?", icon='warning', parent=self.top)
+        
+        plt.close()
+        
+        if not reg_ok == 'yes':
+            tk.messagebox.showinfo('Registration Failed','Please correct any issues with the data before continuing to the next steps. Only once the Rigid Registration is working properly will the following steps be successful.')
+            return
+        
+        messagebox.showinfo("Done", "Rigid Registration Complete", parent=self.top)
 
         self.top.destroy()
