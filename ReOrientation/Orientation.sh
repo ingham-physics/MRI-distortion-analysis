@@ -4,8 +4,8 @@ DStart=`date`
 echo $DStart
 
 # Original MRI-linac files to be analysed (change file names/location as appropriate): 
-ToOrientateFH="./YZ_HF-FH/SE_YZ_FH.nii.gz" 
-ToOrientateHF="./YZ_HF-FH/SE_YZ_HF.nii.gz" 
+ToOrientateFH="./YZ_HF-FH/SE_YZ_FH.nii.gz"
+ToOrientateHF="./YZ_HF-FH/SE_YZ_HF.nii.gz"
 
 # Definition of files for use further on: 
 NewOriginFH="./YZ_HF-FH/SE_YZ_FH_m.nii.gz"
@@ -22,8 +22,8 @@ y="-250"
 z="250"
 
 # Change the orientation to look like a conventional scan: 
-milxImageEditInformation "$ToOrientateFH" "$NewOriginFH" -m -0 -1 0 1 -0 0 0 0 -1
-milxImageEditInformation "$ToOrientateHF" "$NewOriginHF" -m -0 -1 0 1 -0 0 0 0 -1
+milxImageEditInformation "$ToOrientateFH" "$NewOriginFH" -m -0 1 0 1 -0 0 0 0 -1
+milxImageEditInformation "$ToOrientateHF" "$NewOriginHF" -m -0 1 0 1 -0 0 0 0 -1
 
 # No-orientate the images: 
 milxImageOperations -u "$NewOriginFH" "$NoOrientFH"
