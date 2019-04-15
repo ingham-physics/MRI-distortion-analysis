@@ -58,7 +58,7 @@ class DeformationWindow:
         self.grid_spacing = tk.StringVar()
         self.grid_spacing.set("25")
         self.threshold = tk.StringVar()
-        self.threshold.set("100")
+        self.threshold.set("300")
         
         # Define style for labelframe
         s = ttk.Style()
