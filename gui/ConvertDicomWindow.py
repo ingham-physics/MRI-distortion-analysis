@@ -12,7 +12,9 @@ except ImportError:
     from tkinter import messagebox
     from tkinter import filedialog
 
-import os, subprocess
+import os
+
+from convert.convert import convert_dicom
 
 import logging
 logger = logging.getLogger(__name__)
@@ -131,23 +133,21 @@ class ConvertDicomWindow:
         ind = 0
         self.output = []
         for input_dir in dicom_paths:
-        
+
             # Use the directory name as a file name
             output_file = os.path.basename(input_dir) + '.nii.gz'
             output_file = os.path.join(output_dir,output_file)
             output_file = os.path.join(os.getcwd(),output_file)
 
-            try:
-                subprocess.check_output(["itkDicomSeriesReadImageWrite", input_dir, output_file])
+            if convert_dicom(input_dir, output_file):
                 logger.info("Files converted from " + input_dir + " written to " + output_file)
                 self.output.append(output_file)
                 self.listbox_paths.delete(int(ind))
-                
-            except:
+            else:
                 logger.warn("Error converting files from " + input_dir + " to " + output_file)
                 files_converted_success = False
                 ind = ind + 1
-        
+
         # Finally show a message describing which files were successfully converted
         if files_converted_success:
             messagebox.showinfo("Success", "Files converted successfully", parent=self.top)
