@@ -6,9 +6,8 @@ import SimpleITK as sitk
 from convert.convert import convert_dicom
 
 def test_convert():
-    print(os.getcwd())
 
-    dicom_dir = "test/data/dicom"
+    dicom_dir = "test/data/convert/dicom"
     output_file = tempfile.mktemp() + ".nii.gz"
 
     success = convert_dicom(dicom_dir, output_file)
