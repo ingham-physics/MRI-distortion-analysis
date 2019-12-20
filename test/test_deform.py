@@ -27,8 +27,8 @@ def test_deform():
 
     arr =  sitk.GetArrayFromImage(df)
     arr_gt = sitk.GetArrayFromImage(df_gt)
-    assert np.allclose(arr, arr_gt)
+    assert np.allclose(arr, arr_gt, atol=0.001)
 
     csv = np.genfromtxt(output_csv, delimiter=',', skip_header=2)
     csv_gt = np.genfromtxt(csv_gt_file, delimiter=',', skip_header=2)
-    assert np.allclose(csv, csv_gt)
+    assert np.allclose(csv, csv_gt, atol=0.001)
