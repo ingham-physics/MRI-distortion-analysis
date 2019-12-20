@@ -35,7 +35,7 @@ def convert_nifty_reg_image(nifty_file, output_file):
     sitk.WriteImage(out, output_file)
 
 
-def dump_deformation_field(deformation_field, output_file, mask_file=None):
+def dump_deformation_field(deformation_field, output_file, mask_file=None, connected_components=False):
 
     # Read the deformation field
     img = sitk.ReadImage(deformation_field)
@@ -52,16 +52,29 @@ def dump_deformation_field(deformation_field, output_file, mask_file=None):
     if mask_file:
         f.write("Mask Filename = {0}\n".format(mask_file))
 
-    for z in range(img.GetSize()[2]):
-        for y in range(img.GetSize()[1]):
-            for x in range(img.GetSize()[0]):
+    if connected_components:
 
-                if mask:
-                    if not mask.GetPixel((x,y,z)):
-                        continue
+        cc = sitk.ConnectedComponent(mask)
 
-                value = img.GetPixel((x,y,z))
-                f.write("{0}, {1}, {2}, {3}, {4}, {5}\n".format(x, y, z, value[0], value[1], value[2]))
+        lssif = sitk.LabelShapeStatisticsImageFilter()
+        lssif.Execute(cc)
+
+        for c in lssif.GetLabels():
+            centroid = lssif.GetCentroid(c)
+            pix_centroid = cc.TransformPhysicalPointToIndex(centroid)
+            value = img.GetPixel(pix_centroid)
+            f.write("{0}, {1}, {2}, {3}, {4}, {5}\n".format(pix_centroid[0], pix_centroid[1], pix_centroid[2], value[0], value[1], value[2]))
+    else:
+        for z in range(img.GetSize()[2]):
+            for y in range(img.GetSize()[1]):
+                for x in range(img.GetSize()[0]):
+
+                    if mask:
+                        if not mask.GetPixel((x,y,z)):
+                            continue
+
+                    value = img.GetPixel((x,y,z))
+                    f.write("{0}, {1}, {2}, {3}, {4}, {5}\n".format(x, y, z, value[0], value[1], value[2]))
 
     f.close()
 
@@ -118,6 +131,9 @@ def mrl_deformable(source_file, target_file, output_path, grid_spacing=25, thres
     # Generate a masked .csv file from the thresholded image
     file_masked_csv = file_base + "-maskedDefField.csv"
     dump_deformation_field(file_masked_df, file_masked_csv, mask_file=file_mask)
+
+    # Dump the values to .csv by dumping only the centroid of each connected component
+    dump_deformation_field(file_masked_df, file_masked_csv, mask_file=file_mask, connected_components=True)
 
     logger.info('Deformation complete')
 
