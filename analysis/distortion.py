@@ -3,9 +3,11 @@
 import os
 import subprocess
 
+import SimpleITK as sitk
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib
+import seaborn as sns
 
 import logging
 logger = logging.getLogger(__name__)
@@ -20,11 +22,9 @@ def perform_analysis(def_csv_file, output_dir, iso=[0,0,0], px_spacing=[1,1,1], 
 
     if(def_file):
         # Read origin from def_file
-        process = subprocess.Popen(["milxImageInfo", "-s", def_file], stdout=subprocess.PIPE)
-        pxs, err = process.communicate()
-        px_spacing = pxs.decode("utf-8").replace('\n','').split('x')
-        px_spacing = [float(p) for p in px_spacing] # Convert to float
-        
+        df = sitk.ReadImage(def_file)
+        px_spacing = df.GetSpacing()
+
     logger.info('Using Pixel Spacing: ' + str(px_spacing))
 
     # Read data from csv into d
@@ -51,7 +51,6 @@ def perform_analysis(def_csv_file, output_dir, iso=[0,0,0], px_spacing=[1,1,1], 
     logger.info('Mean magnitude: ' + str(mag_mean))
     logger.info('Std magnitude: ' + str(mag_std))
 
-
     output_file = file_base + "_Analysis.txt"
     f = open(output_file, "w")
     f.write('Max magnitude: ' + str(mag_max) + '\n')
@@ -60,12 +59,25 @@ def perform_analysis(def_csv_file, output_dir, iso=[0,0,0], px_spacing=[1,1,1], 
     f.write('Std magnitude: ' + str(mag_std) + '\n')
     f.close()
 
+    display_string = 'Max mag: {:.5f}\n'.format(mag_max)
+    display_string += 'Min mag: {:.5f}\n'.format(mag_min)
+    display_string += 'Mean mag: {:.5f}\n'.format(mag_mean)
+    display_string += 'Std mag: {:.5f}\n'.format(mag_std)
+
     # Scatter plot
     plt.ion() # enables interactive mode
-    plt.scatter(dists_from_iso, mags, s=1)
-    plt.xlabel("Distance from ISO (mm)")
-    plt.ylabel("Total Distortion (mm)")
+    fig, (ax1, ax2) = plt.subplots(ncols=2, figsize=(16, 6))
+    sns.distplot(mags, kde = False, ax=ax2)
+    sns.scatterplot([m[0] for m in dists_from_iso], [m[0] for m in mags], ax=ax1)
+
+    ax1.set(xlabel='Distance from ISO (mm)', ylabel='Total Distortion (mm)')
+    ax2.set(xlabel='Distortion (mm)', ylabel='Frequency')
+
+    plt.figtext(0.15,0.7, display_string)
     plt.show()
+
+    plot_file = file_base + "_plot.png"
+    fig.savefig(plot_file)
 
     logger.info('Analysis complete')
 
@@ -76,4 +88,5 @@ if __name__ == "__main__":
 
     def_field="./CT-maskedDefField.csv"
 
-    perform_analysis(def_field, "analysis.txt", [119, 100, 35], px_spacing = [1.195312,1.195312,3])
+    perform_analysis(def_field, ".", [119, 100, 35], px_spacing = [1.195312,1.195312,3])
+    input("Press Enter to continue...")
