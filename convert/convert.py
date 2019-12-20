@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import os
-import subprocess
+import SimpleITK as sitk
 
 import logging
 logger = logging.getLogger(__name__)
@@ -14,7 +14,15 @@ def convert_dicom(input_dir, output_file):
     success = True
 
     try:
-        subprocess.check_output(["itkDicomSeriesReadImageWrite", input_dir, output_file])
+        reader = sitk.ImageSeriesReader()
+
+        dicom_names = reader.GetGDCMSeriesFileNames( input_dir )
+        reader.SetFileNames(dicom_names)
+
+        image = reader.Execute()
+
+        sitk.WriteImage( image, output_file )
+
         logger.info("Files converted from " + input_dir + " written to " + output_file)
     except Exception as e:
         logger.exception(e)
