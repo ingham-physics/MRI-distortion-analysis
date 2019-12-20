@@ -3,6 +3,8 @@
 import os
 import subprocess
 
+import SimpleITK as sitk
+
 import logging
 logger = logging.getLogger(__name__)
 
@@ -10,6 +12,10 @@ logger = logging.getLogger(__name__)
 def rigid(source_file, target_file, output_path):
 
     logger.info('Rigid registration from source : ' + source_file + ' to target: ' + target_file)
+
+    source = sitk.ReadImage(source_file)
+    target = sitk.ReadImage(target_file)
+
     path, filename_source = os.path.split(source_file)
     file_base_source = os.path.join(output_path, filename_source.split('.')[0])
     path, filename_target = os.path.split(target_file)
@@ -17,15 +23,18 @@ def rigid(source_file, target_file, output_path):
 
     # Move to origin 0,0,0
     file_source_origin = file_base_source + "-ORIGIN.nii.gz"
-    subprocess.call(["milxImageEditInformation", source_file, file_source_origin, "-o", "0", "0", "0"])
-    file_target_origin = file_base_target + "-ORIGIN.nii.gz"
-    subprocess.call(["milxImageEditInformation", target_file, file_target_origin, "-o", "0", "0", "0"])
+    source.SetOrigin((0,0,0))
+    sitk.WriteImage(source, file_source_origin)
 
-    #Rigid registration with Aladin: 
+    file_target_origin = file_base_target + "-ORIGIN.nii.gz"
+    target.SetOrigin((0,0,0))
+    sitk.WriteImage(target, file_target_origin)
+
+    #Rigid registration with Aladin:
     file_rigid_reg = file_base_source + "-Aladin.nii.gz"
     file_rigid_reg_txt = file_base_source + "-Aladin.txt"
     subprocess.call(["reg_aladin", "-ref", file_target_origin, "-flo", file_source_origin, "-res", file_rigid_reg, "-nac", "-maxit", "10", "-rigOnly", "-aff", file_rigid_reg_txt])
-    
+
     # Return registered file and target file
     return file_rigid_reg, file_target_origin
 
