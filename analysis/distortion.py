@@ -2,6 +2,7 @@
 
 import os
 import subprocess
+from datetime import datetime
 
 import SimpleITK as sitk
 import numpy as np
@@ -72,7 +73,11 @@ def perform_analysis(def_csv_file, output_dir, iso=[0,0,0], px_spacing=[1,1,1], 
 
     ax1.set(xlabel='Distance from ISO (mm)', ylabel='Total Distortion (mm)')
     ax2.set(xlabel='Distortion (mm)', ylabel='Frequency')
-
+    
+    now = datetime.now()
+    title = "MRI Distortion QA: {0}".format(now.strftime("%d/%m/%Y, %H:%M:%S"))
+    plt.suptitle(title) 
+    
     plt.figtext(0.15,0.7, display_string)
     plt.show()
 
