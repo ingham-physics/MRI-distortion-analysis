@@ -43,42 +43,63 @@ def perform_analysis(def_csv_file, output_dir, iso=[0,0,0], px_spacing=[1,1,1], 
     # Compute each vector's magnitude
     mags = np.sqrt(np.power(d[:,3:4],2)+np.power(d[:,4:5],2)+np.power(d[:,5:6],2))
 
-    mag_max = np.max(mags)
-    mag_min = np.min(mags)
-    mag_mean = np.mean(mags)
-    mag_std = np.std(mags)
-    logger.info('Max magnitude: ' + str(mag_max))
-    logger.info('Min magnitude: ' + str(mag_min))
-    logger.info('Mean magnitude: ' + str(mag_mean))
-    logger.info('Std magnitude: ' + str(mag_std))
-
-    output_file = file_base + "_Analysis.txt"
-    f = open(output_file, "w")
-    f.write('Max magnitude: ' + str(mag_max) + '\n')
-    f.write('Min magnitude: ' + str(mag_min) + '\n')
-    f.write('Mean magnitude: ' + str(mag_mean) + '\n')
-    f.write('Std magnitude: ' + str(mag_std) + '\n')
-    f.close()
-
-    display_string = 'Max mag: {:.5f}\n'.format(mag_max)
-    display_string += 'Min mag: {:.5f}\n'.format(mag_min)
-    display_string += 'Mean mag: {:.5f}\n'.format(mag_mean)
-    display_string += 'Std mag: {:.5f}\n'.format(mag_std)
-
-    # Scatter plot
+    # Prepare Scatter plot
     plt.ion() # enables interactive mode
     fig, (ax1, ax2) = plt.subplots(ncols=2, figsize=(16, 6))
-    sns.distplot(mags, kde = False, ax=ax2)
-    sns.scatterplot([m[0] for m in dists_from_iso], [m[0] for m in mags], ax=ax1)
 
-    ax1.set(xlabel='Distance from ISO (mm)', ylabel='Total Distortion (mm)')
-    ax2.set(xlabel='Distortion (mm)', ylabel='Frequency')
+    # Compute for different distances from ISO
+    dists = [None, 200, 100]
+    colors = [[1,0,0],[0,1,0],[0,0,1]]
+    for i, dist in enumerate(dists):
+
+        print("Prepare for points within: {0}".format(dist))
+
+        if dist:
+            print(type(dists_from_iso))
+            within_dists_from_iso = dists_from_iso[dists_from_iso < dist]
+            print(type(within_dists_from_iso))
+            within_mags = mags[dists_from_iso < dist]
+        else:
+            within_dists_from_iso = dists_from_iso
+            within_mags = mags
+
+        print(within_dists_from_iso.shape)
+        print(within_mags.shape)
+
+        
+        mag_max = np.max(within_mags)
+        mag_min = np.min(within_mags)
+        mag_mean = np.mean(within_mags)
+        mag_std = np.std(within_mags)
+        logger.info('Max magnitude: ' + str(mag_max))
+        logger.info('Min magnitude: ' + str(mag_min))
+        logger.info('Mean magnitude: ' + str(mag_mean))
+        logger.info('Std magnitude: ' + str(mag_std))
+
+        output_file = file_base + "_Analysis.txt"
+        f = open(output_file, "w")
+        f.write('Max magnitude: ' + str(mag_max) + '\n')
+        f.write('Min magnitude: ' + str(mag_min) + '\n')
+        f.write('Mean magnitude: ' + str(mag_mean) + '\n')
+        f.write('Std magnitude: ' + str(mag_std) + '\n')
+        f.close()
+
+        sns.scatterplot(x = [m for m in within_dists_from_iso], y = [m for m in within_mags], ax=ax1)
+        sns.distplot(within_mags, kde = False, ax=ax2, color=colors[i])
+
+        ax1.set(xlabel='Distance from ISO (mm)', ylabel='Total Distortion (mm)')
+        ax2.set(xlabel='Distortion (mm)', ylabel='Frequency')
+
+    plt.table(cellText=[["test","test","test","test"], ["test","test","test","test"], ["test","test","test","test"]],
+        rowLabels=["10cm from ISO", "20cm from ISO", "Total"],
+        colLabels=["Mean", "Std", "Max", "Min"],
+        cellLoc = 'right', rowLoc = 'center',
+        loc='right', bbox=[.65,.05,.3,.5])
     
     now = datetime.now()
     title = "MRI Distortion QA: {0}".format(now.strftime("%d/%m/%Y, %H:%M:%S"))
     plt.suptitle(title) 
     
-    plt.figtext(0.15,0.7, display_string)
     plt.show()
 
     plot_file = file_base + "_plot.png"
@@ -91,7 +112,7 @@ def perform_analysis(def_csv_file, output_dir, iso=[0,0,0], px_spacing=[1,1,1], 
 # Runs when this script is executed directly from the commmand line
 if __name__ == "__main__":
 
-    def_field="./CT-maskedDefField.csv"
+    def_field="../test/data/deform/GT.csv"
 
     perform_analysis(def_field, ".", [119, 100, 35], px_spacing = [1.195312,1.195312,3])
     input("Press Enter to continue...")
