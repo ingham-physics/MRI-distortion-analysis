@@ -95,13 +95,13 @@ def perform_analysis(
 
         # Write to file only if for whole field
         if dist == None:
-        output_file = file_base + "_Analysis.txt"
-        f = open(output_file, "w")
+            output_file = file_base + "_Analysis.txt"
+            f = open(output_file, "w")
             f.write("Max magnitude: " + str(mag_max) + "\n")
             f.write("Min magnitude: " + str(mag_min) + "\n")
             f.write("Mean magnitude: " + str(mag_mean) + "\n")
             f.write("Std magnitude: " + str(mag_std) + "\n")
-        f.close()
+            f.close()
 
         sns.scatterplot(
             x=[m for m in within_dists_from_iso],
