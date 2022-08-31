@@ -64,6 +64,7 @@ mr_sim_qa_workflow = Workflow('MRI sim QA',
     'Distortion analysis for annual QA on the MRI-sim',
     [
         ConvertDicomWindow,
+        RigidWindow,
         CropWindow,
         DeformationWindow,
         AnalysisWindow,
@@ -84,7 +85,8 @@ mr_volunteer_patient_workflow = Workflow('MR volunteer/patient',
 )
 
 # Define list of active workflows 
-active_workflows = [mr_sim_qa_workflow, mr_volunteer_patient_workflow]
+#active_workflows = [mr_sim_qa_workflow, mr_volunteer_patient_workflow]
+active_workflows = [mr_sim_qa_workflow]
 
 class Application(tk.Frame):
 
