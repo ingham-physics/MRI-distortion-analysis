@@ -27,3 +27,6 @@ To open the application, run:
 
 * **Amy Walker** - *Lead Author* - [amy.walker3@health.nsw.gov.au](amy.walker3@health.nsw.gov.au)
 * **Phillip Chlap** - *Developer* - [phillip.chlap@unsw.edu.au](phillip.chlap@unsw.edu.au)
+
+## Citation
+Walker A, Chlap P, Causer T, Mahmood F, Buckley J,Holloway L. Development of a vendor neutral MRI distortion quality assurance workflow. J Appl Clin Med Phys. 2022;(00):e13735. https://doi.org/10.1002/acm2.13735
