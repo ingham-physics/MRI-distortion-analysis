@@ -1,9 +1,10 @@
-
 import tempfile
 import os
 import SimpleITK as sitk
+import numpy as np
 
 from convert.convert import convert_dicom
+
 
 def test_convert():
 
@@ -17,7 +18,9 @@ def test_convert():
 
     assert im.GetSpacing() == (1.953125, 1.953125, 3.0)
     assert im.GetOrigin() == (7.5, -250.0, 250.0)
-    assert im.GetDirection() == (-0.0, 0.0, -1.0, 1.0, -0.0, 0.0, 0.0, -1.0, 0.0)
+    assert np.allclose(
+        im.GetDirection(), (-0.0, 0.0, -1.0, 1.0, -0.0, 0.0, 0.0, -1.0, 0.0)
+    )
 
     sif = sitk.StatisticsImageFilter()
     sif.Execute(im)
