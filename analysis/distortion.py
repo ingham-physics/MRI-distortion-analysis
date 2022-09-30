@@ -55,7 +55,7 @@ def perform_analysis(
     fig, (ax1, ax2) = plt.subplots(ncols=2, figsize=(16, 6))
 
     # Compute for different distances from ISO
-    dists = [None, 200, 100]
+    dists = [None, 100, 50]
     colors = [[1, 0, 0], [0.13, 0.54, 0.13], [0, 0, 1]]
     table_output = []
     for i, dist in enumerate(dists):
@@ -71,8 +71,8 @@ def perform_analysis(
                 table_output.append(["N/A", "N/A", "N/A", "N/A"])
                 continue
         else:
-            within_dists_from_iso = dists_from_iso
-            within_mags = mags
+            within_dists_from_iso = [m[0] for m in dists_from_iso]
+            within_mags = [m[0] for m in mags]
 
         mag_max = np.max(within_mags)
         mag_min = np.min(within_mags)
@@ -109,7 +109,7 @@ def perform_analysis(
             ax=ax1,
             color=colors[i],
         )
-        sns.distplot(within_mags, kde=False, ax=ax2, color=colors[i], bins=20)
+        sns.histplot(within_mags, kde=False, ax=ax2, color=colors[i], bins=20)
 
         ax1.set(xlabel="Distance from ISO (mm)", ylabel="Total Distortion (mm)")
         ax2.set(xlabel="Distortion (mm)", ylabel="Frequency")
@@ -119,8 +119,8 @@ def perform_analysis(
 
         plt.table(
             cellText=table_output,
-        rowLabels=["10cm from ISO", "20cm from ISO", "Total"],
-        colLabels=["Mean", "Std", "Max", "Min"],
+            rowLabels=["10cm from ISO", "20cm from ISO", "Total"],
+            colLabels=["Mean", "Std", "Max", "Min"],
             cellLoc="right",
             rowLoc="center",
             loc="right",
@@ -128,11 +128,11 @@ def perform_analysis(
         )
     except:
         logger.error("Unable to render table")
-    
+
     now = datetime.now()
     title = "MRI Distortion QA: {0}".format(now.strftime("%d/%m/%Y, %H:%M:%S"))
-    plt.suptitle(title) 
-    
+    plt.suptitle(title)
+
     plt.show()
 
     plot_file = file_base + "_plot.png"
@@ -146,7 +146,7 @@ def perform_analysis(
 # Runs when this script is executed directly from the commmand line
 if __name__ == "__main__":
 
-    def_field="../test/data/deform/GT.csv"
+    def_field = "../test/data/deform/GT.csv"
 
-    perform_analysis(def_field, ".", [119, 100, 35], px_spacing = [1.195312,1.195312,3])
+    perform_analysis(def_field, ".", [119, 100, 35], px_spacing=[1.195312, 1.195312, 3])
     input("Press Enter to continue...")

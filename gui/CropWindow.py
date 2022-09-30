@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
 import matplotlib
-matplotlib.use('TkAgg')
+
+matplotlib.use("TkAgg")
 
 from numpy import arange, sin, pi
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.backend_bases import key_press_handler
 from matplotlib.figure import Figure
 from matplotlib.gridspec import GridSpec
- 
+
 try:
     # Python 2
-    import Tkinter  as tk
+    import Tkinter as tk
     import ttk
     import tkMessageBox as messagebox
     import tkFileDialog as filedialog
@@ -29,21 +30,22 @@ import SimpleITK as sitk
 from crop.util import ImageAxes
 
 import logging
+
 logger = logging.getLogger(__name__)
 
-class CropWindow:
 
+class CropWindow:
     def __init__(self, parent, previous):
 
         self.parent = parent
-        self.title = 'Crop'
+        self.title = "Crop"
         self.previous = previous
         self.output = []
 
     def show(self):
 
         self.top = tk.Toplevel(self.parent)
-        self.top.title('Crop')
+        self.top.title("Crop")
 
         # Define width and height of this window
         w = 600
@@ -52,9 +54,9 @@ class CropWindow:
         # Place the window in the centre of the screen
         ws = self.parent.winfo_screenwidth()
         hs = self.parent.winfo_screenheight()
-        x = (ws/2) - (w/2)
-        y = (hs/2) - (h/2)
-        self.top.geometry('%dx%d+%d+%d' % (w, h, x, y))
+        x = (ws / 2) - (w / 2)
+        y = (hs / 2) - (h / 2)
+        self.top.geometry("%dx%d+%d+%d" % (w, h, x, y))
 
         self.top.update()
         self.top.minsize(self.top.winfo_width(), self.top.winfo_height())
@@ -64,33 +66,49 @@ class CropWindow:
 
         # Define style for labelframe
         s = ttk.Style()
-        s.configure('Main.TLabelframe.Label', font=('helvetica', 12, 'bold'))
+        s.configure("Main.TLabelframe.Label", font=("helvetica", 12, "bold"))
 
         # Files labelframe
-        filesFrame = ttk.Labelframe(self.top, text='File Paths', style = "Main.TLabelframe")
+        filesFrame = ttk.Labelframe(
+            self.top, text="File Paths", style="Main.TLabelframe"
+        )
         filesFrame.grid(row=0, padx=5, pady=5, sticky="news")
         filesFrame.rowconfigure(2, weight=1)
         filesFrame.columnconfigure(0, weight=1)
 
         # Message for files
-        tk.Message(filesFrame, text="Select the file(s) to be cropped. NOTE: if multiple files are selected, they will be cropped by the same amount", font=("Helvetica", 10), width=500, justify=tk.CENTER).grid(row=0, column=0, padx=1, pady=2, sticky='ew')
+        tk.Message(
+            filesFrame,
+            text="Select the file(s) to be cropped. NOTE: if multiple files are selected, they will be cropped by the same amount",
+            font=("Helvetica", 10),
+            width=500,
+            justify=tk.CENTER,
+        ).grid(row=0, column=0, padx=1, pady=2, sticky="ew")
 
         # Add file button
-        tk.Button(filesFrame,text='Add File', command=self.add_file, width=20).grid(row=1, padx=5, pady=5)
+        tk.Button(filesFrame, text="Add File", command=self.add_file, width=20).grid(
+            row=1, padx=5, pady=5
+        )
 
         # Files list box
         self.listbox_paths = tk.Listbox(filesFrame)
-        self.listbox_paths.grid(row=2, columnspan=1, padx=(5,0), pady=5, sticky='news')
+        self.listbox_paths.grid(row=2, columnspan=1, padx=(5, 0), pady=5, sticky="news")
         self.listbox_paths.bind("<<ListboxSelect>>", self.select_file)
         self.selection = self.listbox_paths.curselection()
 
         # Scrollbar for list box
-        vsb = ttk.Scrollbar(filesFrame, orient="vertical", command=self.listbox_paths.yview)
-        vsb.grid(row=2, column=2, sticky=("N", "S", "E", "W"), padx=(0,10), pady=(5, 5))
+        vsb = ttk.Scrollbar(
+            filesFrame, orient="vertical", command=self.listbox_paths.yview
+        )
+        vsb.grid(
+            row=2, column=2, sticky=("N", "S", "E", "W"), padx=(0, 10), pady=(5, 5)
+        )
         self.listbox_paths.configure(yscrollcommand=vsb.set)
 
         # Remove file button
-        tk.Button(filesFrame,text='Remove Selected', command=self.remove_file, width=20).grid(row=3, padx=5, pady=5)
+        tk.Button(
+            filesFrame, text="Remove Selected", command=self.remove_file, width=20
+        ).grid(row=3, padx=5, pady=5)
 
         # StringVars for crop params
         self.strVarXfrom = tk.StringVar()
@@ -101,7 +119,9 @@ class CropWindow:
         self.strVarZto = tk.StringVar()
 
         # Crop plot frame with canvas
-        plot_frame = ttk.Labelframe(self.top, text='Crop Image', style = "Main.TLabelframe")
+        plot_frame = ttk.Labelframe(
+            self.top, text="Crop Image", style="Main.TLabelframe"
+        )
         plot_frame.grid(row=1, padx=15, pady=15, sticky="ew")
         plot_canvas = tk.Frame(plot_frame)
         plot_canvas.grid(row=1, column=0)
@@ -109,54 +129,90 @@ class CropWindow:
         plot_frame.rowconfigure(1, weight=1)
 
         # Message for crop plot
-        tk.Message(plot_frame, text="Use the green box to select the region to be included in the crop. Anything outside this will be removed. If cropping multiple images, toggle between the 2 files in the previous window", font=("Helvetica", 10), width=500, justify=tk.CENTER).grid(row=0, column=0, padx=1, pady=2, sticky='ew')
+        tk.Message(
+            plot_frame,
+            text="Use the green box to select the region to be included in the crop. Anything outside this will be removed. If cropping multiple images, toggle between the 2 files in the previous window",
+            font=("Helvetica", 10),
+            width=500,
+            justify=tk.CENTER,
+        ).grid(row=0, column=0, padx=1, pady=2, sticky="ew")
 
         # Crop params frame
-        param_frame = ttk.Labelframe(self.top, text='Cropping Parameters', style = "Main.TLabelframe")
+        param_frame = ttk.Labelframe(
+            self.top, text="Cropping Parameters", style="Main.TLabelframe"
+        )
         param_frame.grid(row=3, padx=15, pady=15, sticky="ew")
 
         # Message for params
-        tk.Message(param_frame, text="The resulting images will be cropped to the following size. This can be adjusted manually if required", font=("Helvetica", 10), width=500, justify=tk.CENTER).grid(row=0, column=1, columnspan=5, padx=1, pady=2, sticky='ew')
+        tk.Message(
+            param_frame,
+            text="The resulting images will be cropped to the following size. This can be adjusted manually if required",
+            font=("Helvetica", 10),
+            width=500,
+            justify=tk.CENTER,
+        ).grid(row=0, column=1, columnspan=5, padx=1, pady=2, sticky="ew")
 
-        tk.Label(param_frame,text='X', font=("Helvetica", 10)).grid(row=1, column=2, padx=0, pady=0)
-        tk.Label(param_frame,text='Y', font=("Helvetica", 10)).grid(row=1, column=3, padx=0, pady=0)
-        tk.Label(param_frame,text='Z', font=("Helvetica", 10)).grid(row=1, column=4, padx=0, pady=0)
-        tk.Label(param_frame,text='From:', font=("Helvetica", 10)).grid(row=2, column=1, padx=15, pady=0)
-        tk.Label(param_frame,text='To:', font=("Helvetica", 10)).grid(row=3, column=1, padx=15, pady=0)
+        tk.Label(param_frame, text="X", font=("Helvetica", 10)).grid(
+            row=1, column=2, padx=0, pady=0
+        )
+        tk.Label(param_frame, text="Y", font=("Helvetica", 10)).grid(
+            row=1, column=3, padx=0, pady=0
+        )
+        tk.Label(param_frame, text="Z", font=("Helvetica", 10)).grid(
+            row=1, column=4, padx=0, pady=0
+        )
+        tk.Label(param_frame, text="From:", font=("Helvetica", 10)).grid(
+            row=2, column=1, padx=15, pady=0
+        )
+        tk.Label(param_frame, text="To:", font=("Helvetica", 10)).grid(
+            row=3, column=1, padx=15, pady=0
+        )
         entXFrom = tk.Entry(param_frame, textvariable=self.strVarXfrom, width=10)
         entXFrom.grid(row=2, column=2, padx=15, pady=15)
-        entXFrom.bind ("<Return>",  (lambda _: self.entry_changed()))
-        entXFrom.bind ("<FocusOut>",  (lambda _: self.entry_changed()))
+        entXFrom.bind("<Return>", (lambda _: self.entry_changed()))
+        entXFrom.bind("<FocusOut>", (lambda _: self.entry_changed()))
         entXto = tk.Entry(param_frame, textvariable=self.strVarXto, width=10)
         entXto.grid(row=3, column=2, padx=15, pady=15)
-        entXto.bind ("<Return>",  (lambda _: self.entry_changed()))
-        entXto.bind ("<FocusOut>",  (lambda _: self.entry_changed()))
+        entXto.bind("<Return>", (lambda _: self.entry_changed()))
+        entXto.bind("<FocusOut>", (lambda _: self.entry_changed()))
         entYFrom = tk.Entry(param_frame, textvariable=self.strVarYfrom, width=10)
         entYFrom.grid(row=2, column=3, padx=15, pady=15)
-        entYFrom.bind ("<Return>",  (lambda _: self.entry_changed()))
-        entYFrom.bind ("<FocusOut>",  (lambda _: self.entry_changed()))
+        entYFrom.bind("<Return>", (lambda _: self.entry_changed()))
+        entYFrom.bind("<FocusOut>", (lambda _: self.entry_changed()))
         entYTo = tk.Entry(param_frame, textvariable=self.strVarYto, width=10)
         entYTo.grid(row=3, column=3, padx=15, pady=15)
-        entYTo.bind ("<Return>",  (lambda _: self.entry_changed()))
-        entYTo.bind ("<FocusOut>",  (lambda _: self.entry_changed()))
+        entYTo.bind("<Return>", (lambda _: self.entry_changed()))
+        entYTo.bind("<FocusOut>", (lambda _: self.entry_changed()))
         entZFrom = tk.Entry(param_frame, textvariable=self.strVarZfrom, width=10)
         entZFrom.grid(row=2, column=4, padx=15, pady=15)
-        entZFrom.bind ("<Return>",  (lambda _: self.entry_changed()))
-        entZFrom.bind ("<FocusOut>",  (lambda _: self.entry_changed()))
+        entZFrom.bind("<Return>", (lambda _: self.entry_changed()))
+        entZFrom.bind("<FocusOut>", (lambda _: self.entry_changed()))
         entZTo = tk.Entry(param_frame, textvariable=self.strVarZto, width=10)
         entZTo.grid(row=3, column=4, padx=15, pady=15)
-        entZTo.bind ("<Return>",  (lambda _: self.entry_changed()))
-        entZTo.bind ("<FocusOut>",  (lambda _: self.entry_changed()))
+        entZTo.bind("<Return>", (lambda _: self.entry_changed()))
+        entZTo.bind("<FocusOut>", (lambda _: self.entry_changed()))
 
         # Radio buttons for Units (voxels or mm)
         self.units = tk.IntVar()
-        tk.Radiobutton(param_frame, text="mm", variable=self.units, value=1,
-                command = lambda : self.update_units()).grid(row=2, column=5, padx=15, pady=15)
-        tk.Radiobutton(param_frame, text="voxels", variable=self.units, value=2,
-                command = lambda : self.update_units()).grid(row=3, column=5, padx=15, pady=15)
+        tk.Radiobutton(
+            param_frame,
+            text="mm",
+            variable=self.units,
+            value=1,
+            command=lambda: self.update_units(),
+        ).grid(row=2, column=5, padx=15, pady=15)
+        tk.Radiobutton(
+            param_frame,
+            text="voxels",
+            variable=self.units,
+            value=2,
+            command=lambda: self.update_units(),
+        ).grid(row=3, column=5, padx=15, pady=15)
         self.units.set(1)
 
-        tk.Button(self.top,text='Crop', command=self.crop, width=30, height=2).grid(row=4, padx=5, pady=5)
+        tk.Button(self.top, text="Crop", command=self.crop, width=30, height=2).grid(
+            row=4, padx=5, pady=5
+        )
 
         self.top.columnconfigure(0, weight=1)
         self.top.rowconfigure(1, weight=1)
@@ -179,7 +235,7 @@ class CropWindow:
         self.axSag.get_xaxis().set_visible(False)
         self.axSag.get_yaxis().set_visible(False)
 
-        fig.subplots_adjust(bottom=0.05, top=0.95, left=0, right=1)   
+        fig.subplots_adjust(bottom=0.05, top=0.95, left=0, right=1)
 
         self.canvas = FigureCanvasTkAgg(fig, master=plot_canvas)
         self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
@@ -202,14 +258,14 @@ class CropWindow:
         self.load_image(self.listbox_paths.get(self.listbox_paths.curselection()))
 
     def update_units(self):
-        if self.units.get() == 1: # mm
+        if self.units.get() == 1:  # mm
             self.strVarXfrom.set("{:.2f}".format(self.physFrom[0]))
             self.strVarXto.set("{:.2f}".format(self.physTo[0]))
             self.strVarYfrom.set("{:.2f}".format(self.physFrom[1]))
             self.strVarYto.set("{:.2f}".format(self.physTo[1]))
             self.strVarZfrom.set("{:.2f}".format(self.physFrom[2]))
             self.strVarZto.set("{:.2f}".format(self.physTo[2]))
-        else: # voxels
+        else:  # voxels
             indFrom = self.img.TransformPhysicalPointToIndex(self.physFrom)
             indTo = self.img.TransformPhysicalPointToIndex(self.physTo)
             self.strVarXfrom.set(str(indFrom[0]))
@@ -221,29 +277,49 @@ class CropWindow:
 
     def entry_changed(self):
         # Read values from entry fields and update the phys coords
-        if self.units.get() == 1: # mm
-            self.physFrom = (float(self.strVarXfrom.get()), float(self.strVarYfrom.get()), float(self.strVarZfrom.get()) )
-            self.physTo = (float(self.strVarXto.get()), float(self.strVarYto.get()), float(self.strVarZto.get()) )
-        else: # voxels
-            indFrom = (int(self.strVarXfrom.get()), int(self.strVarYfrom.get()), int(self.strVarZfrom.get()) )
-            indTo = (int(self.strVarXto.get()), int(self.strVarYto.get()), int(self.strVarZto.get()) )
+        if self.units.get() == 1:  # mm
+            self.physFrom = (
+                float(self.strVarXfrom.get()),
+                float(self.strVarYfrom.get()),
+                float(self.strVarZfrom.get()),
+            )
+            self.physTo = (
+                float(self.strVarXto.get()),
+                float(self.strVarYto.get()),
+                float(self.strVarZto.get()),
+            )
+        else:  # voxels
+            indFrom = (
+                int(self.strVarXfrom.get()),
+                int(self.strVarYfrom.get()),
+                int(self.strVarZfrom.get()),
+            )
+            indTo = (
+                int(self.strVarXto.get()),
+                int(self.strVarYto.get()),
+                int(self.strVarZto.get()),
+            )
 
             self.physFrom = self.img.TransformIndexToPhysicalPoint(indFrom)
             self.physTo = self.img.TransformIndexToPhysicalPoint(indTo)
-        
+
         # Clamp the values to be in range of image
         sz = self.img.GetSize()
         indFrom = self.img.TransformPhysicalPointToIndex(self.physFrom)
         indTo = self.img.TransformPhysicalPointToIndex(self.physTo)
 
-        indFrom = (max(indFrom[0],0), max(indFrom[1],0), max(indFrom[2],0))
-        indFrom = (min(indFrom[0],sz[0]), min(indFrom[1],sz[1]), min(indFrom[2],sz[2]))
-        indTo = (max(indTo[0],0), max(indTo[1],0), max(indTo[2],0))
-        indTo = (min(indTo[0],sz[0]), min(indTo[1],sz[1]), min(indTo[2],sz[2]))
-        
+        indFrom = (max(indFrom[0], 0), max(indFrom[1], 0), max(indFrom[2], 0))
+        indFrom = (
+            min(indFrom[0], sz[0]),
+            min(indFrom[1], sz[1]),
+            min(indFrom[2], sz[2]),
+        )
+        indTo = (max(indTo[0], 0), max(indTo[1], 0), max(indTo[2], 0))
+        indTo = (min(indTo[0], sz[0]), min(indTo[1], sz[1]), min(indTo[2], sz[2]))
+
         self.physFrom = self.img.TransformIndexToPhysicalPoint(indFrom)
         self.physTo = self.img.TransformIndexToPhysicalPoint(indTo)
-        
+
         self.update_units()
 
         self.update_selection()
@@ -253,14 +329,14 @@ class CropWindow:
         indFrom = self.img.TransformPhysicalPointToIndex(self.physFrom)
         indTo = self.img.TransformPhysicalPointToIndex(self.physTo)
 
-        if axis == 0: # Axial
-            indFrom = (int(rect[0][0]), int(rect[0][1]), indFrom[2]) 
+        if axis == 0:  # Axial
+            indFrom = (int(rect[0][0]), int(rect[0][1]), indFrom[2])
             indTo = (int(rect[1][0]), int(rect[1][1]), indTo[2])
-        if axis == 1: # Coronal
-            indFrom = (int(rect[0][0]), indFrom[1], int(rect[0][1])) 
+        if axis == 1:  # Coronal
+            indFrom = (int(rect[0][0]), indFrom[1], int(rect[0][1]))
             indTo = (int(rect[1][0]), indTo[1], int(rect[1][1]))
-        if axis == 2: # Sagittal
-            indFrom = (indFrom[0], int(rect[0][0]), int(rect[0][1])) 
+        if axis == 2:  # Sagittal
+            indFrom = (indFrom[0], int(rect[0][0]), int(rect[0][1]))
             indTo = (indTo[0], int(rect[1][0]), int(rect[1][1]))
 
         self.physFrom = self.img.TransformIndexToPhysicalPoint(indFrom)
@@ -277,28 +353,16 @@ class CropWindow:
             indTo = self.img.TransformPhysicalPointToIndex(self.physTo)
 
             self.imAx.set_selected_region(
-                indFrom[0],
-                indFrom[1],
-                indFrom[2],
-                indTo[0],
-                indTo[1], 
-                indTo[2])
+                indFrom[0], indFrom[1], indFrom[2], indTo[0], indTo[1], indTo[2]
+            )
 
             self.imCor.set_selected_region(
-                indFrom[0],
-                indFrom[2],
-                indFrom[1],
-                indTo[0],
-                indTo[2],
-                indTo[1])
+                indFrom[0], indFrom[2], indFrom[1], indTo[0], indTo[2], indTo[1]
+            )
 
             self.imSag.set_selected_region(
-                indFrom[1],
-                indFrom[2],
-                indFrom[0],
-                indTo[1],
-                indTo[2],
-                indTo[0])
+                indFrom[1], indFrom[2], indFrom[0], indTo[1], indTo[2], indTo[0]
+            )
         except AttributeError as e:
             # Occurs when no image has been loaded yet
             # We can safely ignore
@@ -312,26 +376,30 @@ class CropWindow:
     def load_image(self, img_file):
 
         try:
-            self.img=sitk.ReadImage(img_file)
+            self.img = sitk.ReadImage(img_file)
         except:
-            print('File read failed ' + img_file )
-            messagebox.showerror("Error", "An error occurred while reading the input file", parent=self.top)
+            print("File read failed " + img_file)
+            messagebox.showerror(
+                "Error",
+                "An error occurred while reading the input file",
+                parent=self.top,
+            )
             return
 
         self.axAx.clear()
         self.axCor.clear()
         self.axSag.clear()
-        
+
         self.imAx = ImageAxes(0, self.axAx, self.img, self.rect_selected)
         self.imCor = ImageAxes(1, self.axCor, self.img, self.rect_selected)
         self.imSag = ImageAxes(2, self.axSag, self.img, self.rect_selected)
         self.canvas.draw()
-        self.canvas.mpl_connect('scroll_event', self.imAx.onscroll)
-        self.canvas.mpl_connect('scroll_event', self.imCor.onscroll)
-        self.canvas.mpl_connect('scroll_event', self.imSag.onscroll)
+        self.canvas.mpl_connect("scroll_event", self.imAx.onscroll)
+        self.canvas.mpl_connect("scroll_event", self.imCor.onscroll)
+        self.canvas.mpl_connect("scroll_event", self.imSag.onscroll)
 
-        if not hasattr(self, 'physFrom'):
-            self.physFrom = self.img.TransformIndexToPhysicalPoint((0,0,0))
+        if not hasattr(self, "physFrom"):
+            self.physFrom = self.img.TransformIndexToPhysicalPoint((0, 0, 0))
             self.physTo = self.img.TransformIndexToPhysicalPoint(self.img.GetSize())
 
         self.update_units()
@@ -340,7 +408,7 @@ class CropWindow:
 
     def insert_file(self, f):
         self.listbox_paths.insert(tk.END, f)
-        self.listbox_paths.select_clear(0,tk.END)
+        self.listbox_paths.select_clear(0, tk.END)
         self.listbox_paths.select_set(tk.END)
 
         self.selection = self.listbox_paths.curselection()
@@ -350,10 +418,10 @@ class CropWindow:
     def add_file(self):
 
         initial_dir = self.parent.workspace
-        
+
         if self.listbox_paths.size() > 0:
             initial_dir = os.path.dirname(self.listbox_paths.get(tk.END))
-            
+
         f = filedialog.askopenfilename(parent=self.top, initialdir=initial_dir)
         if len(f) == 0:
             # Cancelled
@@ -361,7 +429,7 @@ class CropWindow:
         f = os.path.normpath(f)
 
         self.insert_file(f)
-       
+
     def remove_file(self):
 
         selected_indexes = self.listbox_paths.curselection()
@@ -374,10 +442,10 @@ class CropWindow:
     def crop(self):
 
         # Create the output directory if it doesn't already exist
-        output_dir = os.path.join(self.parent.workspace,'crop')
+        output_dir = os.path.join(self.parent.workspace, "crop")
         try:
             # Python 3
-            os.makedirs(output_dir, exist_ok=True) # > Python 3.2
+            os.makedirs(output_dir, exist_ok=True)  # > Python 3.2
         except TypeError:
             # Python 2
             try:
@@ -389,13 +457,12 @@ class CropWindow:
         # Crop each image loaded to physical coords
         self.output = []
         for i, img_file in enumerate(self.listbox_paths.get(0, tk.END)):
-            logger.info('Cropping: ' + img_file)
+            logger.info("Cropping: " + img_file)
 
             # Determine output file name
             path, filename = os.path.split(img_file)
-            file_base = os.path.join(output_dir, filename.split('.')[0])
-            output_file = file_base + '_cropped.nii.gz'
-
+            file_base = os.path.join(output_dir, filename.split(".")[0])
+            output_file = file_base + "_cropped.nii.gz"
 
             # Convert the physical coordinates to the voxels coords for this image
             img = sitk.ReadImage(img_file)
@@ -404,26 +471,21 @@ class CropWindow:
 
             # Crop the image
             crop = sitk.CropImageFilter()
-            lowerBoundary = [indFrom[0],
-                indFrom[1],
-                indFrom[2]]
+            lowerBoundary = [indFrom[0], indFrom[1], indFrom[2]]
             crop.SetLowerBoundaryCropSize(indFrom)
 
             size = self.img.GetSize()
-            upperBoundary = [size[0]-indTo[0],
-                size[1]-indTo[1],
-                size[2]-indTo[2]]
+            upperBoundary = [size[0] - indTo[0], size[1] - indTo[1], size[2] - indTo[2]]
             crop.SetUpperBoundaryCropSize(upperBoundary)
 
-            cropped_image = crop.Execute ( img )
+            cropped_image = crop.Execute(img)
 
             # Save the file
             writer = sitk.ImageFileWriter()
-            writer.SetFileName ( output_file )
-            writer.Execute ( cropped_image )
+            writer.SetFileName(output_file)
+            writer.Execute(cropped_image)
 
             self.output.append(output_file)
-
 
         messagebox.showinfo("Done", "Image(s) Cropped", parent=self.top)
 
