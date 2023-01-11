@@ -95,7 +95,6 @@ def mask_deformation_field(deformation_field, mask_file, output_file):
     sitk.WriteImage(out, output_file)
 
 
-# Runs reorientation
 def mrl_deformable(source_file, target_file, output_path, grid_spacing=25, threshold=100):
 
     logger.info('Deforming source : ' + source_file + ' to target: ' + target_file)
@@ -114,7 +113,7 @@ def mrl_deformable(source_file, target_file, output_path, grid_spacing=25, thres
     file_disp = file_base + "-DISP.nii.gz"
     convert_nifty_reg_image(file_disp_nifty, file_disp)
 
-    # Export the masked deformation field as a .csv file to then be read (e.g.: by MATLAB) to pull out the deformation numbers 
+    # Export the deformation field as a .csv file to then be read (e.g.: by MATLAB) to pull out the deformation numbers 
     file_total = file_base + "DeformationField_total.csv"
     dump_deformation_field(file_disp, file_total)
 
@@ -133,7 +132,8 @@ def mrl_deformable(source_file, target_file, output_path, grid_spacing=25, thres
     dump_deformation_field(file_masked_df, file_masked_csv, mask_file=file_mask)
 
     # Dump the values to .csv by dumping only the centroid of each connected component
-    dump_deformation_field(file_masked_df, file_masked_csv, mask_file=file_mask, connected_components=True)
+    file_masked_csv_center = file_base + "-maskedDefFieldCenterCapsules.csv"
+    dump_deformation_field(file_masked_df, file_masked_csv_center, mask_file=file_mask, connected_components=True)
 
     logger.info('Deformation complete')
 

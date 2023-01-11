@@ -106,7 +106,7 @@ class DeformationWindow:
         grid_spacing_frame.columnconfigure(0, weight=1)
 
         # Message for grid spacing
-        tk.Message(grid_spacing_frame, text="Final control point grid spacing for the registration. MRI-sim QA use 25mm; MRI-volunteer/patients use 10mm", font=("Helvetica", 10), width=500, justify=tk.CENTER).grid(row=0, column=0, padx=1, pady=2, sticky='ew')
+        tk.Message(grid_spacing_frame, text="Final control point grid spacing for the registration. Recommended values: 25mm for Phantoms; 10mm for anatomical images. Avoid making grid too small to ensure smooth DVF.", font=("Helvetica", 10), width=500, justify=tk.CENTER).grid(row=0, column=0, padx=1, pady=2, sticky='ew')
 
         # Grid spacing label
         tk.Label(grid_spacing_frame,textvariable=self.grid_spacing, font=("Helvetica", 10, 'bold')).grid(row=1, padx=15, pady=15)
